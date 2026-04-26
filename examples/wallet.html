@@ -5,22 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NeoTranscript Student Wallet</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f8f9fa; }
     h1 { color: #0d6efd; }
-    .credential { border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 8px; background: #f8f9fa; }
-    button { padding: 12px 24px; background: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 5px; }
-    button:hover { background: #0b5ed7; }
-    .share { background: #198754; }
+    .credential { 
+      background: white; 
+      border: 1px solid #ddd; 
+      padding: 20px; 
+      margin: 20px 0; 
+      border-radius: 12px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button { 
+      padding: 14px 24px; 
+      font-size: 16px; 
+      margin: 8px 4px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+    }
+    .share { background: #198754; color: white; }
+    .copy { background: #6c757d; color: white; }
   </style>
 </head>
 <body>
-  <h1>🪪 NeoTranscript Student Wallet</h1>
-  <p>Your secure, self-owned transcripts live here.</p>
+  <h1>🪪 My NeoTranscript Wallet</h1>
+  <p>Your transcripts. Your control.</p>
 
-  <div id="credentials"></div>
+  <div class="credential">
+    <h3>📜 Bachelor of Science in Computer Science</h3>
+    <p><strong>Student:</strong> Alex Rivera</p>
+    <p><strong>University:</strong> Example University</p>
+    <p><strong>GPA:</strong> 3.87 • Graduated: May 15, 2025</p>
+    <p><strong>Honors:</strong> Dean's List</p>
+    
+    <button class="share" onclick="shareCredential()">Share Credential</button>
+    <button class="copy" onclick="copyCredential()">Copy JSON for Verifier</button>
+  </div>
 
   <script>
-    const sampleCredential = {
+    const credential = {
       "@context": ["https://www.w3.org/ns/credentials/v2"],
       "type": ["VerifiableCredential", "TranscriptCredential"],
       "issuer": "https://example-university.edu",
@@ -36,36 +59,15 @@
       }
     };
 
-    function renderWallet() {
-      const container = document.getElementById('credentials');
-      container.innerHTML = `
-        <div class="credential">
-          <h3>📜 Transcript • Example University</h3>
-          <p><strong>Student:</strong> ${sampleCredential.credentialSubject.preferredName}</p>
-          <p><strong>Degree:</strong> ${sampleCredential.credentialSubject.degree}</p>
-          <p><strong>Major:</strong> ${sampleCredential.credentialSubject.major}</p>
-          <p><strong>GPA:</strong> ${sampleCredential.credentialSubject.gpa}</p>
-          <p><strong>Issued:</strong> ${new Date(sampleCredential.issuanceDate).toLocaleDateString()}</p>
-          
-          <button onclick="shareCredential()">Share Public Link / QR</button>
-          <button class="share" onclick="copyToClipboard()">Copy JSON</button>
-        </div>
-      `;
-    }
-
     function shareCredential() {
-      alert("✅ In a real wallet this would generate a shareable public link or QR code.\n\nFor demo: Copy the JSON below and paste into verifier.html");
-      console.log("Shared credential:", JSON.stringify(sampleCredential, null, 2));
+      alert("In a real wallet this would generate a secure public link or QR code.\n\nFor now, use the Copy JSON button and paste into Verifier.");
     }
 
-    function copyToClipboard() {
-      navigator.clipboard.writeText(JSON.stringify(sampleCredential, null, 2)).then(() => {
-        alert("✅ Credential JSON copied to clipboard! Paste it into the Verifier Demo.");
+    function copyCredential() {
+      navigator.clipboard.writeText(JSON.stringify(credential, null, 2)).then(() => {
+        alert("✅ JSON copied! Go to Verifier Demo and paste it.");
       });
     }
-
-    // Load wallet on page open
-    window.onload = renderWallet;
   </script>
 </body>
 </html>
