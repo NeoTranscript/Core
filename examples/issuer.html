@@ -14,7 +14,13 @@
 </head>
 <body>
   <h1>NeoTranscript Issuer Demo</h1>
-  <p>Issue a rich, verifiable transcript</p>
+  <p>Issue either a High School Diploma or College Transcript</p>
+
+  <label>Credential Type</label>
+  <select id="credentialType">
+    <option value="transcript">College Transcript</option>
+    <option value="diploma">High School Diploma</option>
+  </select>
 
   <label>Student Legal Name</label>
   <input type="text" id="legalName" value="Alexander James Rivera">
@@ -22,11 +28,11 @@
   <label>Preferred Name</label>
   <input type="text" id="preferredName" value="Alex Rivera">
 
-  <label>Degree</label>
-  <input type="text" id="degree" value="Bachelor of Science in Computer Science">
+  <label id="institutionLabel">University / School Name</label>
+  <input type="text" id="institution" value="Example University">
 
-  <label>Major</label>
-  <input type="text" id="major" value="Computer Science">
+  <label id="degreeLabel">Degree / Diploma Type</label>
+  <input type="text" id="degree" value="Bachelor of Science in Computer Science">
 
   <label>GPA</label>
   <input type="text" id="gpa" value="3.87">
@@ -34,33 +40,37 @@
   <label>Graduation Date</label>
   <input type="date" id="gradDate" value="2025-05-15">
 
-  <label>University</label>
-  <input type="text" id="university" value="Example University">
-
   <button onclick="issueCredential()">Issue Credential</button>
 
   <div id="output"></div>
 
   <script>
     function issueCredential() {
+      const type = document.getElementById('credentialType').value;
+      const isTranscript = type === 'transcript';
+
       const credential = {
         "@context": ["https://www.w3.org/ns/credentials/v2"],
-        "type": ["VerifiableCredential", "TranscriptCredential"],
-        "issuer": `https://${document.getElementById('university').value.toLowerCase().replace(/ /g, '-')}.edu`,
+        "type": ["VerifiableCredential", isTranscript ? "TranscriptCredential" : "DiplomaCredential"],
+        "issuer": `https://${document.getElementById('institution').value.toLowerCase().replace(/ /g, '-')}.edu`,
         "issuanceDate": new Date().toISOString(),
         "credentialSubject": {
           "legalName": document.getElementById('legalName').value,
           "preferredName": document.getElementById('preferredName').value,
-          "degree": document.getElementById('degree').value,
-          "major": document.getElementById('major').value,
           "gpa": parseFloat(document.getElementById('gpa').value),
           "graduationDate": document.getElementById('gradDate').value,
-          "academicHonors": ["Dean's List"]
         }
       };
 
+      if (isTranscript) {
+        credential.credentialSubject.degree = document.getElementById('degree').value;
+        credential.credentialSubject.major = "Computer Science";
+      } else {
+        credential.credentialSubject.diplomaType = document.getElementById('degree').value || "High School Diploma";
+      }
+
       document.getElementById('output').innerHTML = `
-        <strong>✅ Credential Issued Successfully!</strong><br><br>
+        <strong>✅ ${isTranscript ? 'College Transcript' : 'High School Diploma'} Issued!</strong><br><br>
         Copy this JSON and test it in the Verifier:<br><br>
         <pre>${JSON.stringify(credential, null, 2)}</pre>
       `;
