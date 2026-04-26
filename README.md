@@ -12,11 +12,10 @@ Students own their transcripts via public-private keys. Colleges sign once. Empl
 - Open source & standards compliant (DCC, 1EdTech, Blockcerts)
 
 ### Links
-- [Whitepaper](/WHITEPAPER.md)
-- [Project Roadmap](https://github.com/orgs/neotranscript/projects)
-- [Discussion & Feedback](https://github.com/neotranscript/core/discussions)
 
----
+- **[Whitepaper](WHITEPAPER.md)**
+- **[Project Roadmap](https://github.com/orgs/neotranscript/projects)**
+- **[Discussion & Feedback](https://github.com/neotranscript/core/discussions)**
 
 **Status**: Early stage — actively building MVP
 
