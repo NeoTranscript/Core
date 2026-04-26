@@ -8,14 +8,13 @@
     body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
     h1 { color: #0d6efd; }
     input, select { width: 100%; padding: 10px; margin: 8px 0; }
-    button { padding: 12px 24px; background: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
-    button:hover { background: #0b5ed7; }
-    #output { margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap; font-family: monospace; font-size: 14px; }
+    button { padding: 14px 28px; background: #0d6efd; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+    #output { margin-top: 20px; background: #f8f9fa; padding: 20px; border-radius: 12px; white-space: pre-wrap; font-family: monospace; }
   </style>
 </head>
 <body>
   <h1>NeoTranscript Issuer Demo</h1>
-  <p>College Registrar — Issue a rich, verifiable transcript</p>
+  <p>Issue a rich, verifiable transcript</p>
 
   <label>Student Legal Name</label>
   <input type="text" id="legalName" value="Alexander James Rivera">
@@ -29,7 +28,7 @@
   <label>Major</label>
   <input type="text" id="major" value="Computer Science">
 
-  <label>GPA (Cumulative)</label>
+  <label>GPA</label>
   <input type="text" id="gpa" value="3.87">
 
   <label>Graduation Date</label>
@@ -60,10 +59,9 @@
         }
       };
 
-      const outputDiv = document.getElementById('output');
-      outputDiv.innerHTML = `
-        <strong>✅ Credential Issued!</strong><br><br>
-        Copy this JSON and paste it into the <a href="verifier.html">Verifier Demo</a>:<br><br>
+      document.getElementById('output').innerHTML = `
+        <strong>✅ Credential Issued Successfully!</strong><br><br>
+        Copy this JSON and test it in the Verifier:<br><br>
         <pre>${JSON.stringify(credential, null, 2)}</pre>
       `;
     }
