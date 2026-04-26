@@ -2,7 +2,7 @@
 
 **Student-Owned Cryptographic Transcripts**  
 
-A standards-based replacement for centralized verification gatekeepers like the National Student Clearinghouse.
+A standards-based replacement for centralized verification gatekeepers like the National Student Clearinghouse. 
 
 Students own their transcripts via public-private keys. Colleges sign once. Employers verify instantly — no forms, no per-verification fees, no middlemen.
 
