@@ -7,12 +7,13 @@ A standards-based replacement for centralized verification gatekeepers like the 
 Students own their transcripts via public-private keys. Colleges sign once. Employers verify instantly — no forms, no per-verification fees, no middlemen.
 
 ### Try the Live Demos
-**[→ Open Demo Hub](examples/index.html)**
+
+**[→ Open Demo Hub](examples/index.html)** *(GitHub Pages coming soon)*
 
 - Issuer Demo (college registrar)
 - Student Wallet
 - Verifier Demo (employer view)
-
+  
 ### Key Features
 
 - W3C Verifiable Credentials + Decentralized Identifiers
