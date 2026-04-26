@@ -6,6 +6,13 @@ A standards-based replacement for centralized verification gatekeepers like the 
 
 Students own their transcripts via public-private keys. Colleges sign once. Employers verify instantly — no forms, no per-verification fees, no middlemen.
 
+### Try the Live Demos
+**[→ Open Demo Hub](examples/index.html)**
+
+- Issuer Demo (college registrar)
+- Student Wallet
+- Verifier Demo (employer view)
+
 ### Key Features
 
 - W3C Verifiable Credentials + Decentralized Identifiers
@@ -17,13 +24,13 @@ Students own their transcripts via public-private keys. Colleges sign once. Empl
 
 - **[Whitepaper](WHITEPAPER.md)**
 - **[Project Roadmap](https://github.com/orgs/neotranscript/projects)**
-- **[Discussion & Feedback](https://github.com/neotranscript/core/discussions)**
+- **[Discussions & Feedback](https://github.com/neotranscript/core/discussions)**
 
 ---
 
-**Status**: Early stage — actively building MVP
+**Status**: Early stage — MVP demos now live
 
 **Want to help?**  
 - Star the repo ⭐  
-- Join the discussion  
+- Try the demos and give feedback  
 - Share with higher ed / edtech contacts
