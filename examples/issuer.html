@@ -10,20 +10,26 @@
     input, select { width: 100%; padding: 10px; margin: 8px 0; }
     button { padding: 12px 24px; background: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
     button:hover { background: #0b5ed7; }
-    #output { margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap; font-family: monospace; }
+    #output { margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; white-space: pre-wrap; font-family: monospace; font-size: 14px; }
   </style>
 </head>
 <body>
   <h1>NeoTranscript Issuer Demo</h1>
-  <p>Simulate a college registrar issuing a signed transcript.</p>
+  <p>College Registrar — Issue a rich, verifiable transcript</p>
 
-  <label>Student Name</label>
-  <input type="text" id="name" value="Alex Rivera">
+  <label>Student Legal Name</label>
+  <input type="text" id="legalName" value="Alexander James Rivera">
+
+  <label>Preferred Name</label>
+  <input type="text" id="preferredName" value="Alex Rivera">
 
   <label>Degree</label>
-  <input type="text" id="degree" value="Bachelor of Computer Science">
+  <input type="text" id="degree" value="Bachelor of Science in Computer Science">
 
-  <label>GPA</label>
+  <label>Major</label>
+  <input type="text" id="major" value="Computer Science">
+
+  <label>GPA (Cumulative)</label>
   <input type="text" id="gpa" value="3.87">
 
   <label>Graduation Date</label>
@@ -32,36 +38,32 @@
   <label>University</label>
   <input type="text" id="university" value="Example University">
 
-  <button onclick="issueCredential()">Issue Signed Credential</button>
+  <button onclick="issueCredential()">Issue Credential</button>
 
   <div id="output"></div>
 
   <script>
     function issueCredential() {
-      const name = document.getElementById('name').value;
-      const degree = document.getElementById('degree').value;
-      const gpa = document.getElementById('gpa').value;
-      const gradDate = document.getElementById('gradDate').value;
-      const university = document.getElementById('university').value;
-
       const credential = {
         "@context": ["https://www.w3.org/ns/credentials/v2"],
         "type": ["VerifiableCredential", "TranscriptCredential"],
-        "issuer": `https://${university.toLowerCase().replace(/ /g, '-')}.edu`,
+        "issuer": `https://${document.getElementById('university').value.toLowerCase().replace(/ /g, '-')}.edu`,
         "issuanceDate": new Date().toISOString(),
         "credentialSubject": {
-          "name": name,
-          "degree": degree,
-          "gpa": gpa,
-          "graduationDate": gradDate,
-          "major": "Computer Science"
+          "legalName": document.getElementById('legalName').value,
+          "preferredName": document.getElementById('preferredName').value,
+          "degree": document.getElementById('degree').value,
+          "major": document.getElementById('major').value,
+          "gpa": parseFloat(document.getElementById('gpa').value),
+          "graduationDate": document.getElementById('gradDate').value,
+          "academicHonors": ["Dean's List"]
         }
       };
 
       const outputDiv = document.getElementById('output');
       outputDiv.innerHTML = `
-        <strong>✅ Credential Issued Successfully!</strong><br><br>
-        Copy the JSON below and paste it into the <a href="verifier.html">Verifier Demo</a>:
+        <strong>✅ Credential Issued!</strong><br><br>
+        Copy this JSON and paste it into the <a href="verifier.html">Verifier Demo</a>:<br><br>
         <pre>${JSON.stringify(credential, null, 2)}</pre>
       `;
     }
