@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeoTranscript Student Wallet</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+    h1 { color: #0d6efd; }
+    .credential { border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 8px; background: #f8f9fa; }
+    button { padding: 12px 24px; background: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 5px; }
+    button:hover { background: #0b5ed7; }
+    .share { background: #198754; }
+  </style>
+</head>
+<body>
+  <h1>🪪 NeoTranscript Student Wallet</h1>
+  <p>Your secure, self-owned transcripts live here.</p>
+
+  <div id="credentials"></div>
+
+  <script>
+    const sampleCredential = {
+      "@context": ["https://www.w3.org/ns/credentials/v2"],
+      "type": ["VerifiableCredential", "TranscriptCredential"],
+      "issuer": "https://example-university.edu",
+      "issuanceDate": "2025-05-20T00:00:00Z",
+      "credentialSubject": {
+        "legalName": "Alexander James Rivera",
+        "preferredName": "Alex Rivera",
+        "degree": "Bachelor of Science in Computer Science",
+        "major": "Computer Science",
+        "gpa": 3.87,
+        "graduationDate": "2025-05-15",
+        "academicHonors": ["Dean's List"]
+      }
+    };
+
+    function renderWallet() {
+      const container = document.getElementById('credentials');
+      container.innerHTML = `
+        <div class="credential">
+          <h3>📜 Transcript • Example University</h3>
+          <p><strong>Student:</strong> ${sampleCredential.credentialSubject.preferredName}</p>
+          <p><strong>Degree:</strong> ${sampleCredential.credentialSubject.degree}</p>
+          <p><strong>Major:</strong> ${sampleCredential.credentialSubject.major}</p>
+          <p><strong>GPA:</strong> ${sampleCredential.credentialSubject.gpa}</p>
+          <p><strong>Issued:</strong> ${new Date(sampleCredential.issuanceDate).toLocaleDateString()}</p>
+          
+          <button onclick="shareCredential()">Share Public Link / QR</button>
+          <button class="share" onclick="copyToClipboard()">Copy JSON</button>
+        </div>
+      `;
+    }
+
+    function shareCredential() {
+      alert("✅ In a real wallet this would generate a shareable public link or QR code.\n\nFor demo: Copy the JSON below and paste into verifier.html");
+      console.log("Shared credential:", JSON.stringify(sampleCredential, null, 2));
+    }
+
+    function copyToClipboard() {
+      navigator.clipboard.writeText(JSON.stringify(sampleCredential, null, 2)).then(() => {
+        alert("✅ Credential JSON copied to clipboard! Paste it into the Verifier Demo.");
+      });
+    }
+
+    // Load wallet on page open
+    window.onload = renderWallet;
+  </script>
+</body>
+</html>
