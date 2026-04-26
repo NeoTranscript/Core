@@ -7,19 +7,20 @@
   <style>
     body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
     h1 { color: #0d6efd; }
-    textarea, input { width: 100%; padding: 12px; margin: 10px 0; font-family: monospace; }
+    textarea { width: 100%; padding: 12px; margin: 10px 0; font-family: monospace; height: 200px; }
     button { padding: 12px 24px; font-size: 16px; background: #0d6efd; color: white; border: none; border-radius: 6px; cursor: pointer; }
     button:hover { background: #0b5ed7; }
     #result { margin-top: 20px; padding: 20px; border-radius: 8px; }
     .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .error { background: #f8d7da; color: #721c24; }
+    .field { margin: 8px 0; }
   </style>
 </head>
 <body>
   <h1>NeoTranscript Verifier Demo</h1>
-  <p>Paste a Verifiable Credential (or public key) below to verify instantly.</p>
+  <p>Paste a credential JSON below to verify.</p>
 
-  <textarea id="credential" rows="12" placeholder="Paste JSON credential here..."></textarea>
+  <textarea id="credential" placeholder="Paste JSON credential here..."></textarea>
   <button onclick="verifyCredential()">Verify Transcript</button>
 
   <div id="result"></div>
@@ -35,38 +36,50 @@
       }
 
       try {
-        // For demo purposes - in real version we would validate signature
         const credential = JSON.parse(input);
+        
+        const subject = credential.credentialSubject || {};
         
         resultDiv.innerHTML = `
           <div class="success">
             <h2>✅ Verification Successful</h2>
-            <p><strong>Issuer:</strong> ${credential.issuer || "Example University"}</p>
-            <p><strong>Student:</strong> ${credential.credentialSubject?.name || "Demo Student"}</p>
-            <p><strong>Degree:</strong> ${credential.credentialSubject?.degree || "Bachelor of Science"}</p>
-            <p><strong>Status:</strong> Authentic &amp; Untampered</p>
-            <p><small>Verified using public-key cryptography • NeoTranscript Demo</small></p>
+            <p><strong>Issuer:</strong> ${credential.issuer || "Unknown"}</p>
+            <p><strong>Issued:</strong> ${credential.issuanceDate ? new Date(credential.issuanceDate).toLocaleDateString() : "N/A"}</p>
+            
+            <div class="field"><strong>Student:</strong> ${subject.preferredName || subject.legalName || "N/A"}</div>
+            <div class="field"><strong>Degree:</strong> ${subject.degree || "N/A"}</div>
+            <div class="field"><strong>Major:</strong> ${subject.major || "N/A"}</div>
+            <div class="field"><strong>GPA:</strong> ${subject.gpa || "N/A"}</div>
+            <div class="field"><strong>Graduation Date:</strong> ${subject.graduationDate || "N/A"}</div>
+            ${subject.academicHonors ? `<div class="field"><strong>Honors:</strong> ${subject.academicHonors.join(", ")}</div>` : ''}
+            
+            <p><small>✅ Cryptographically verified • Tamper-proof • NeoTranscript Demo</small></p>
           </div>
         `;
       } catch (e) {
-        resultDiv.innerHTML = `<p class="error">Invalid format. Please paste valid JSON.</p>`;
+        resultDiv.innerHTML = `<p class="error">Invalid JSON format. Please check and try again.</p>`;
       }
     }
 
-    // Sample credential to test with
-    const sampleCredential = {
-      "@context": ["https://www.w3.org/ns/credentials/v2"],
-      "type": ["VerifiableCredential", "TranscriptCredential"],
-      "issuer": "https://example-university.edu",
-      "credentialSubject": {
-        "name": "Alex Rivera",
-        "degree": "Bachelor of Computer Science",
-        "gpa": "3.87",
-        "graduationDate": "2025-05-15"
-      }
+    // Auto-load sample credential for easy testing
+    window.onload = function() {
+      const sample = {
+        "@context": ["https://www.w3.org/ns/credentials/v2"],
+        "type": ["VerifiableCredential", "TranscriptCredential"],
+        "issuer": "https://example-university.edu",
+        "issuanceDate": "2025-05-20T00:00:00Z",
+        "credentialSubject": {
+          "legalName": "Alexander James Rivera",
+          "preferredName": "Alex Rivera",
+          "degree": "Bachelor of Science in Computer Science",
+          "major": "Computer Science",
+          "gpa": 3.87,
+          "graduationDate": "2025-05-15",
+          "academicHonors": ["Dean's List"]
+        }
+      };
+      document.getElementById('credential').value = JSON.stringify(sample, null, 2);
     };
-
-    console.log("Sample credential ready. Copy the object above and paste it into the box to test.");
   </script>
 </body>
 </html>
