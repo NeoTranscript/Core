@@ -1,11 +1,11 @@
 # NeoTranscript Whitepaper
 
-**Student-Owned Cryptographic Transcripts: A Standards-Based Replacement for Centralized Verification Gatekeepers**
+**Student-Owned Cryptographic Transcripts and Diplomas: A Standards-Based Replacement for Centralized Verification Gatekeepers**
 
-**Version 1.0**  
-**Date:** April 25, 2026  
+**Version 1.1**  
+**Date:** April 27, 2026  
 **Author:** Alec Tolson (@AlTols on X)  
-**Repository:** https://github.com/neotranscript/core  
+**Repository:** https://github.com/neotranscript/Core  
 **Project:** NeoTranscript
 
 ## Table of Contents
@@ -25,95 +25,82 @@
 
 The National Student Clearinghouse (NSC) serves as the dominant intermediary for U.S. postsecondary verification, covering approximately 97% of enrollments. While useful, the system still relies on per-verification fees, administrative friction, forms, and portals.
 
-**NeoTranscript** delivers a complete student-owned alternative using public-key cryptography and W3C Verifiable Credentials (VCs). Colleges sign transcripts once at graduation and deliver them to a student-controlled digital wallet. Verifiers simply use a public key or shareable link for instant, trustless, tamper-proof validation — eliminating per-verification fees and intermediaries.
+**NeoTranscript** delivers a complete student-owned alternative using public-key cryptography and W3C Verifiable Credentials (VCs). Colleges and high schools sign once at graduation and deliver transcripts or diplomas to a student-controlled digital wallet. Verifiers simply use a public key or shareable link for instant, trustless, tamper-proof validation — eliminating per-verification fees and intermediaries.
 
-The signature **NSC Onboarding Bridge** enables seamless migration from legacy systems. NeoTranscript is built on mature open standards (W3C, DCC, 1EdTech) and is ready for pilots today.
+The signature **NSC Onboarding Bridge** enables seamless migration from legacy systems. NeoTranscript supports **both college transcripts and high school diplomas** and is built on mature open standards.
 
 ## 1. The Problem: Centralized Gatekeepers in a Digital Age
 
-The National Student Clearinghouse generated approximately $102 million in revenue in FY2024 (with third-party estimates reaching $126 million), primarily from verification and data services. It processes millions of verifications annually for employers, graduate schools, and background checkers.
+The National Student Clearinghouse generated approximately $102 million in revenue in FY2024. It processes millions of verifications annually.
 
-However, several core issues persist:
+However, core issues persist for both **college** and **high school** records:
+- Repeated costs and friction
+- Lack of true student ownership
+- Scalability limits for lifelong learning
+- Administrative burden on registrars and school staff
 
-- **Cost and Friction**: Repeated per-verification fees, authorization forms, and manual reviews that burden students, employers, and institutions.
-- **Lack of Ownership**: Students cannot directly control or present their own records.
-- **Scalability Limits**: Lifelong learning, micro-credentials, global mobility, and rising credential fraud strain the centralized model.
-- **Administrative Burden**: Registrars continue to handle residual requests despite high NSC participation.
-
-The broader global education verification services market is experiencing strong growth, projected to move from roughly $1.2–1.5 billion toward $2–3+ billion in the coming years, driven by digital transformation and fraud concerns.
+High schools face additional challenges with diploma verification, especially for transfers, homeschool students, and older records.
 
 ## 2. NeoTranscript: The Solution
 
-NeoTranscript shifts from institutional gatekeeping to **student sovereignty** while keeping colleges as the authoritative issuer.
+NeoTranscript shifts from institutional gatekeeping to **student sovereignty** while keeping schools as the authoritative issuer.
 
 **Core Process:**
-1. At graduation, the college cryptographically signs the official transcript and binds it to a student-generated public-private key pair.
+1. At graduation, the school (college or high school) cryptographically signs the transcript or diploma.
 2. The signed Verifiable Credential is delivered to the student’s secure digital wallet.
-3. Students control all sharing (full transcript or selective disclosure) via public key, QR code, or link.
-4. Any verifier instantly confirms authenticity and integrity using public-key cryptography — no third-party portals required.
+3. Students control sharing via public key, QR code, or link.
+4. Verifiers instantly confirm authenticity — no third-party portals required.
 
 ## 3. Key Features
 
+- Support for **both college transcripts and high school diplomas**
 - Cryptographic tamper-proof security (W3C VC standard)
 - Selective disclosure for enhanced privacy
-- Built-in revocation and re-issuance mechanisms
-- Lifelong credential management (micro-credentials, future records)
-- **NSC Onboarding Bridge**: Self-service and bulk migration from existing NSC/SIS records
-- Full compliance with W3C Verifiable Credentials, DIDs, 1EdTech CLR/Open Badges 3.0, and DCC guidelines
+- Built-in revocation and re-issuance
+- Lifelong credential management
+- **NSC Onboarding Bridge** for colleges and high school record migration
+- Full compliance with W3C Verifiable Credentials, DIDs, 1EdTech, and DCC guidelines
 
 ## 4. Technical Architecture
 
-NeoTranscript follows the standard Issuer-Holder-Verifier model:
-
-- **Issuer (College)**: Lightweight dashboard or API that integrates with existing Student Information Systems.
-- **Holder (Student)**: Modern web or mobile wallet supporting open standards.
-- **Verifier (Employer/Grad School)**: Free, no-account web tool or API for instant signature verification.
-- **Storage**: Hybrid — off-chain for performance with optional blockchain anchoring for public trust.
-- **NSC Bridge Layer**: Automated mapping and issuance from legacy data feeds.
-
-All components are built on proven open-source foundations (Digital Credentials Consortium tools, Blockcerts, vc-js libraries).
+NeoTranscript follows the standard Issuer-Holder-Verifier model with support for multiple credential types (`TranscriptCredential` and `DiplomaCredential`).
 
 ## 5. Real-World Precedents
 
-This approach is already proven:
-- **MIT Digital Diplomas**: Ongoing since 2017 using Blockcerts. Graduates receive cryptographically signed credentials verifiable without contacting the registrar.
-- **Digital Credentials Consortium (DCC)**: Consortium of leading universities advancing privacy-enhanced verifiable credentials in higher education.
-- **1EdTech Consortium**: Standards for Comprehensive Learner Records and Open Badges 3.0.
-- National-scale examples such as Malta’s blockchain credentials demonstrate portability at scale.
+- MIT Digital Diplomas (Blockcerts since 2017)
+- Digital Credentials Consortium (DCC)
+- 1EdTech Consortium standards
+- National and state-level digital credential initiatives
 
 ## 6. Benefits
 
-- **Students**: True data ownership, portability, privacy, and lifelong control.
-- **Colleges**: One-time issuance ends perpetual verification requests and reduces registrar workload.
-- **Employers & Verifiers**: Instant, free, fraud-resistant checks.
-- **Broader Ecosystem**: Lower systemic costs, reduced credential fraud, and better support for skills-based hiring and global mobility.
+- **Students**: True ownership of both college and high school records
+- **Schools**: Reduced workload for both colleges and high schools
+- **Employers**: Instant verification of any education credential
+- **Broader Ecosystem**: Better support for lifelong learning and K-12 to college transitions
 
 ## 7. Addressing Adoption Hurdles
 
-- **Institutional inertia** → Parallel operation with NSC + free migration pilot.
-- **Integration costs** → Open-source tools with minimal custom glue code.
-- **Interoperability** → Strict adherence to W3C and 1EdTech standards.
-- **Compliance (FERPA, privacy)** → Built-in consent, selective disclosure, and revocation.
-- **Chicken-and-egg adoption** → NSC Bridge + dead-simple public verifier tool.
+- Institutional inertia → Parallel operation + free migration pilot for both colleges and high schools
+- Integration costs → Open-source tools
+- Compliance → Built-in consent and selective disclosure
 
 ## 8. Risks and Mitigation
 
-- **Key Management**: Students losing private keys → Easy recovery/revocation flows and educational onboarding.
-- **Regulatory Compliance**: FERPA and data privacy → Designed with explicit consent and minimal central data storage.
-- **Adoption Speed**: Slow institutional buy-in → Start with willing early adopters and demonstrate ROI.
-- **Security**: Cryptographic vulnerabilities → Use audited open-source libraries and encourage third-party audits.
+- Key management → Recovery flows and education
+- Regulatory compliance → Explicit consent
+- Adoption speed → Start with willing local institutions
 
 ## 9. Implementation Roadmap
 
-**Phase 1 (MVP – 4–8 weeks)**: College issuer dashboard with NSC Bridge, student wallet demo, public verifier, and initial pilot(s).  
-**Phase 2**: Full mobile wallet, bulk migration tools, and production readiness.  
-**Phase 3**: Ecosystem partnerships, employer integrations, and broader adoption.
+**Phase 1 (MVP – 4–8 weeks)**: Issuer, Wallet, and Verifier demos supporting both college transcripts and high school diplomas.  
+**Phase 2**: Production tools and first pilots.  
+**Phase 3**: Ecosystem partnerships.
 
 ## 10. Call to Action
 
-- **Institutions & Registrars**: Join a pilot or test the NSC Bridge.
+- **Colleges and High Schools**: Join a pilot or test the NSC Bridge.
 - **Developers**: Contribute to the open-source repository.
-- **Employers**: Demand and support verifiable credentials.
-- **Everyone**: Share this project and help spread the vision.
+- **Employers**: Demand verifiable credentials.
 
-The transcript of the future belongs in the student’s wallet — secure, portable, and instantly verifiable.
+The transcript and diploma of the future belongs in the student’s wallet — secure, portable, and instantly verifiable.
