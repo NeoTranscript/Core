@@ -46,10 +46,12 @@ High schools face additional challenges with diploma verification, especially fo
 NeoTranscript shifts from institutional gatekeeping to **student sovereignty** while keeping schools as the authoritative issuer.
 
 **Core Process:**
-1. At graduation, the school (college or high school) cryptographically signs the transcript or diploma.
+1. At graduation, the school (college or high school) cryptographically signs the official transcript or diploma, including full course-level detail when available.
 2. The signed Verifiable Credential is delivered to the student’s secure digital wallet.
-3. Students control sharing via public key, QR code, or link.
-4. Verifiers instantly confirm authenticity — no third-party portals required.
+3. Students control sharing via public key, QR code, or link. They can choose to share the **full detailed transcript** (all courses and grades) or use selective disclosure for privacy (e.g., degree + GPA only).
+
+**Precise Fidelity**
+Unlike the National Student Clearinghouse, which primarily provides high-level degree confirmation (without full course grades or GPA), NeoTranscript is designed to retain the complete, precise information found on official school transcripts. This includes course codes, titles, credits, individual grades, cumulative GPA, honors, and more. The goal is to deliver a verifiable credential that is at least as detailed as — and often richer than — traditional paper or PDF transcripts.
 
 ## 3. Key Features
 
