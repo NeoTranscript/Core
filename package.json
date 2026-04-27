@@ -7,6 +7,7 @@
     "issuer": "node src/issuer/simple-issuer.js",
     "issuer:transcript": "node src/issuer/simple-issuer.js --type transcript",
     "issuer:diploma": "node src/issuer/simple-issuer.js --type diploma",
+    "dev": "echo 'Open examples/index.html in your browser to run the demos'",
     "test": "echo \"No tests yet\" && exit 0"
   },
   "repository": {
