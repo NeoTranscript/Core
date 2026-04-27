@@ -28,7 +28,7 @@
     .issuer { background: #0d6efd; color: white; }
     .wallet { background: #198754; color: white; }
     .verifier { background: #6c757d; color: white; }
-    .note { font-size: 0.95em; color: #555; margin-top: 30px; text-align: center; }
+    .note { font-size: 0.95em; color: #555; margin-top: 30px; text-align: center; background: #fff3cd; padding: 15px; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -49,14 +49,16 @@
 
   <div class="demo-card">
     <h3>3. Verifier Demo</h3>
-    <p><strong>Employers & Grad Schools</strong><br>Instantly verify any credential with full detail</p>
+    <p><strong>Employers & Grad Schools</strong><br>Instantly verify any credential</p>
     <a href="verifier.html"><button class="verifier">Open Verifier Demo →</button></a>
   </div>
 
   <div class="note">
-    <strong>Try the full flow:</strong> Issuer → copy JSON → Wallet → Share → Verifier<br><br>
-    Supports both college transcripts (with course details) and high school diplomas.<br>
-    All demos are fully functional and run directly from this repository.
+    <strong>How to use the full flow:</strong><br><br>
+    1. Run <code>npm run issuer</code> in terminal to generate real JSON credentials<br>
+    2. Open Issuer Demo → Issue a credential<br>
+    3. Copy JSON or use "Load Generated" buttons in Verifier<br><br>
+    All demos support both college transcripts (with courses) and high school diplomas.
   </div>
 </body>
 </html>
