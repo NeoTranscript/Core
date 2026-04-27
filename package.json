@@ -1,0 +1,30 @@
+{
+  "name": "neotranscript",
+  "version": "0.1.0",
+  "description": "Student-owned cryptographic transcripts and diplomas using W3C Verifiable Credentials",
+  "main": "src/issuer/simple-issuer.js",
+  "scripts": {
+    "issuer": "node src/issuer/simple-issuer.js",
+    "issuer:transcript": "node src/issuer/simple-issuer.js --type transcript",
+    "issuer:diploma": "node src/issuer/simple-issuer.js --type diploma",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neotranscript/Core.git"
+  },
+  "keywords": [
+    "verifiable-credentials",
+    "edtech",
+    "higher-education",
+    "digital-identity",
+    "transcripts",
+    "diplomas"
+  ],
+  "author": "Alec Tolson (@AlTols)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/neotranscript/Core/issues"
+  },
+  "homepage": "https://github.com/neotranscript/Core#readme"
+}
