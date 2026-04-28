@@ -1,38 +1,31 @@
 # NeoTranscript
 
-**Student-Owned Cryptographic Transcripts**  
+**Student-Owned Cryptographic Transcripts & Diplomas**
 
-A standards-based replacement for centralized verification gatekeepers like the National Student Clearinghouse.
+A standards-based, open-source replacement for centralized verification gatekeepers like the National Student Clearinghouse.
 
-Students own their transcripts and diplomas via public-private keys. Colleges and high schools sign once. Employers verify instantly — no forms, no per-verification fees, no middlemen.
+Students own their records via public-private keys. Colleges and high schools sign once. Employers verify instantly — no forms, no fees, no middlemen.
 
 ### Try the Live Demos
 
 **[→ Open Demo Hub](https://neotranscript.github.io/Core/examples/index.html)**
 
-- Issuer Demo (College Transcript + High School Diploma)
+- Issuer Demo (College + High School)
 - Student Wallet
 - Verifier Demo
 
-### Key Features
+### Getting Started (Local Development)
 
-- W3C Verifiable Credentials + Decentralized Identifiers
-- Support for both college transcripts and high school diplomas
-- NSC Onboarding Bridge for seamless migration
-- Selective disclosure and full student control
-- Open source & standards compliant (DCC, 1EdTech, Blockcerts)
+```bash
+# 1. Clone the repo
+git clone https://github.com/neotranscript/Core.git
+cd Core
 
-### Links
+# 2. Install dependencies (optional but recommended)
+npm install
 
-- **[Whitepaper](WHITEPAPER.md)**
-- **[Project Roadmap](https://github.com/orgs/neotranscript/projects)**
-- **[Discussions & Feedback](https://github.com/neotranscript/Core/discussions)**
+# 3. Generate sample credentials
+npm run issuer
 
----
-
-**Status**: Early stage — Interactive demos now live
-
-**Want to help?**  
-- Star the repo ⭐  
-- Try the demos and give feedback  
-- Share with higher ed, K-12, or edtech contacts
+# 4. Open the demos
+# Open examples/index.html in your browser
