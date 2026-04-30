@@ -8,7 +8,7 @@ No more dependency on centralized services like the National Student Clearinghou
 
 ## Live Demo (Works in Browser — No Install Needed)
 
-- **[Demo Hub](https://neotranscript.github.io/Core/examples/index.html)**  
+- **[Demo Page](https://neotranscript.github.io/Core/examples/index.html)**  
 - **[1. Issuer Demo](https://neotranscript.github.io/Core/examples/issuer.html)** — Create rich transcripts & diplomas  
 - **[2. Student Wallet](https://neotranscript.github.io/Core/examples/wallet.html)** — View, selective disclosure, PDF export  
 - **[3. Verifier](https://neotranscript.github.io/Core/examples/verifier.html)** — Anyone can verify instantly
@@ -34,7 +34,7 @@ No more dependency on centralized services like the National Student Clearinghou
 
 ## Getting Started
 
-1. Visit the [Demo Hub](https://neotranscript.github.io/Core/examples/index.html) to try it immediately
+1. Visit the **[Demo Page](https://neotranscript.github.io/Core/examples/index.html)** to try it immediately
 2. Clone the repo locally:
    - Go to https://github.com/neotranscript/Core
    - Click "Code" → Download ZIP or use git clone
