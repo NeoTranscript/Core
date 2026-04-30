@@ -8,13 +8,23 @@
     body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
     h1 { color: #0d6efd; }
     input, select { width: 100%; padding: 10px; margin: 8px 0; }
-    button { padding: 14px 28px; background: #0d6efd; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+    button { 
+      padding: 14px 28px; 
+      font-size: 16px; 
+      margin: 8px 4px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+    }
+    button:hover { opacity: 0.9; }
+    .issue-btn { background: #0d6efd; color: white; }
+    .copy-btn { background: #198754; color: white; }
     #output { margin-top: 20px; background: #f8f9fa; padding: 20px; border-radius: 12px; white-space: pre-wrap; font-family: monospace; }
   </style>
 </head>
 <body>
   <h1>NeoTranscript Issuer Demo</h1>
-  <p>Issue either a High School Diploma or College Transcript</p>
+  <p>Issue a signed transcript or diploma</p>
 
   <label>Credential Type</label>
   <select id="credentialType">
@@ -40,7 +50,7 @@
   <label>Graduation Date</label>
   <input type="date" id="gradDate" value="2025-05-15">
 
-  <button onclick="issueCredential()">Issue Credential</button>
+  <button class="issue-btn" onclick="issueCredential()">Issue Credential</button>
 
   <div id="output"></div>
 
@@ -69,11 +79,19 @@
         credential.credentialSubject.diplomaType = document.getElementById('degree').value || "High School Diploma";
       }
 
+      const jsonString = JSON.stringify(credential, null, 2);
+
       document.getElementById('output').innerHTML = `
-        <strong>✅ ${isTranscript ? 'College Transcript' : 'High School Diploma'} Issued!</strong><br><br>
-        Copy this JSON and test it in the Verifier:<br><br>
-        <pre>${JSON.stringify(credential, null, 2)}</pre>
+        <strong>✅ Credential Issued Successfully!</strong><br><br>
+        <button class="copy-btn" onclick="copyToClipboard('${jsonString.replace(/'/g, "\\'")}')">📋 Copy JSON to Clipboard</button><br><br>
+        <pre>${jsonString}</pre>
       `;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("✅ JSON copied to clipboard! Paste it into the Verifier Demo.");
+      });
     }
   </script>
 </body>
