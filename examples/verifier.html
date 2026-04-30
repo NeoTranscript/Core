@@ -5,28 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NeoTranscript Verifier</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
     button { padding: 12px 20px; margin: 8px 4px; font-size: 16px; }
-    textarea { width: 100%; height: 300px; font-family: monospace; }
+    textarea { width: 100%; height: 200px; font-family: monospace; }
     .card { border: 2px solid #4CAF50; padding: 20px; border-radius: 8px; margin: 15px 0; background: #f9fff9; }
-    .success { color: green; font-weight: bold; font-size: 1.2em; }
+    .success { color: green; font-weight: bold; font-size: 1.3em; }
     .fail { color: red; font-weight: bold; }
-    pre { background: #f4f4f4; padding: 15px; border-radius: 6px; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #f0f0f0; }
+    .scrollable { max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
   </style>
 </head>
 <body>
   <h1>NeoTranscript Verifier</h1>
-  <p>Anyone (employer, school, government) can instantly verify a credential.</p>
+  <p>Instant, trustworthy verification of student-owned credentials.</p>
 
   <button onclick="loadFromLocalStorage()">Load Latest Credential from Wallet</button>
   <button onclick="clearVerification()">Clear</button>
 
   <h3>Paste Credential JSON (optional)</h3>
-  <textarea id="input" placeholder='Paste full credential JSON here...'></textarea>
+  <textarea id="input" placeholder="Paste full credential JSON here..."></textarea><br>
   <button onclick="verifyCredential()">Verify Credential</button>
 
   <div id="result"></div>
-  <pre id="raw" style="display:none;"></pre>
 
   <hr>
   <p><a href="index.html">← Demo Hub</a> | 
@@ -34,52 +36,59 @@
      <a href="wallet.html">← Wallet</a></p>
 
   <script>
-    async function verifyCredential(jsonText = null) {
+    async function verifyCredential() {
       const resultEl = document.getElementById('result');
-      const rawEl = document.getElementById('raw');
-      
       let cred;
 
       try {
-        if (jsonText) {
-          cred = JSON.parse(jsonText);
-        } else {
-          const input = document.getElementById('input').value.trim();
-          cred = input ? JSON.parse(input) : null;
-        }
+        const input = document.getElementById('input').value.trim();
+        const saved = localStorage.getItem('lastIssuedCredential');
 
-        if (!cred) {
-          // Try loading from localStorage
-          const saved = localStorage.getItem('lastIssuedCredential');
-          if (!saved) throw new Error("No credential found");
+        if (input) {
+          cred = JSON.parse(input);
+        } else if (saved) {
           cred = JSON.parse(saved);
+        } else {
+          throw new Error("No credential available");
         }
 
-        rawEl.textContent = JSON.stringify(cred, null, 2);
-        rawEl.style.display = 'block';
+        const subject = cred.credentialSubject || cred;
+        const courses = subject.courses || [];
+        const isValid = !!(cred.proof && cred.issuer);
 
-        // Simulated verification (in real version this would check the cryptographic proof)
-        const isValid = !!(cred.proof && cred.issuer && cred.credentialSubject);
+        let courseHTML = '';
+        if (courses.length > 0) {
+          courseHTML = `
+            <h3>Courses (${courses.length})</h3>
+            <div class="scrollable">
+              <table>
+                <thead><tr><th>Code</th><th>Course Name</th><th>Grade</th><th>Credits</th></tr></thead>
+                <tbody>
+                  ${courses.map(c => `
+                    <tr>
+                      <td><strong>${c.courseCode}</strong></td>
+                      <td>${c.name}</td>
+                      <td>${c.grade}</td>
+                      <td>${c.credits}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>`;
+        }
 
-        let html = `
+        const html = `
           <div class="card">
             <h2>Verification Result</h2>
-            ${isValid ? 
-              '<p class="success">✅ VALID CREDENTIAL</p>' : 
-              '<p class="fail">❌ INVALID OR TAMPERED CREDENTIAL</p>'
-            }
+            ${isValid ? '<p class="success">✅ VALID CREDENTIAL</p>' : '<p class="fail">❌ INVALID</p>'}
             
             <p><strong>Issuer:</strong> ${cred.issuer}</p>
             <p><strong>Issued:</strong> ${new Date(cred.issuanceDate).toLocaleDateString()}</p>
-            <p><strong>Holder:</strong> ${cred.credentialSubject?.name || 'Unknown'}</p>
-            <p><strong>Type:</strong> ${cred.type?.join(', ') || 'VerifiableCredential'}</p>
+            <p><strong>Holder:</strong> ${subject.name || 'Unknown'}</p>
+            <p><strong>GPA:</strong> ${subject.gpa || 'N/A'}</p>
+            <p><strong>${cred.type?.includes('HighSchoolDiplomaCredential') ? 'Diploma' : 'Degree'}:</strong> ${subject.degree || 'N/A'}</p>
             
-            ${isValid ? `
-              <p style="color:green;">• Cryptographic proof present<br>
-                 • Issuer recognized<br>
-                 • Document not revoked<br>
-                 • Data integrity confirmed</p>
-            ` : ''}
+            ${courseHTML}
           </div>
         `;
 
@@ -89,32 +98,19 @@
         resultEl.innerHTML = `
           <div class="card" style="border-color:#f44336;">
             <p class="fail">❌ Verification Failed</p>
-            <p>Error: ${err.message}</p>
-            <p>Make sure you issued a credential first in issuer.html</p>
-          </div>
-        `;
+            <p>${err.message}</p>
+          </div>`;
       }
     }
 
     function loadFromLocalStorage() {
-      document.getElementById('input').value = ''; // clear manual input
+      document.getElementById('input').value = '';
       verifyCredential();
     }
 
     function clearVerification() {
       document.getElementById('result').innerHTML = '';
-      document.getElementById('raw').style.display = 'none';
-      document.getElementById('input').value = '';
     }
-
-    // Auto demo on load
-    window.onload = () => {
-      const saved = localStorage.getItem('lastIssuedCredential');
-      if (saved) {
-        document.getElementById('result').innerHTML = 
-          '<p style="color:#666;">Click "Load Latest Credential from Wallet" to verify.</p>';
-      }
-    };
   </script>
 </body>
 </html>
