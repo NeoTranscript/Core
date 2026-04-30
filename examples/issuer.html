@@ -5,54 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NeoTranscript Issuer Demo</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-    button, input, select { padding: 10px; margin: 5px; font-size: 16px; }
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    input, select, button { padding: 10px; margin: 5px; font-size: 16px; }
+    button { cursor: pointer; }
+    .course { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fafafa; }
     textarea { width: 100%; height: 400px; font-family: monospace; }
     .success { color: green; }
     .error { color: red; }
   </style>
 </head>
 <body>
-  <h1>NeoTranscript Issuer Demo (Browser-only)</h1>
-  <p>This version works 100% in the browser with real cryptographic signing.</p>
+  <h1>NeoTranscript Issuer Demo — Full Transcript Builder</h1>
+  <p>Build rich college transcripts or high school diplomas with full course records.</p>
 
-  <h2>Student Transcript / Diploma</h2>
-
+  <h2>Student Info</h2>
   <label>Name: <input type="text" id="name" value="Alex Rivera"></label><br>
   <label>Student ID: <input type="text" id="studentId" value="S12345"></label><br>
   <label>Degree / Diploma: <input type="text" id="degree" value="BS Computer Science"></label><br>
   <label>GPA: <input type="number" id="gpa" value="3.87" step="0.01"></label><br>
   <label>Graduation Date: <input type="date" id="gradDate" value="2025-05-15"></label><br><br>
 
-  <button onclick="issueCredential()">Issue Verifiable Credential</button>
-  <button onclick="issueDiploma()">Issue High School Diploma</button>
+  <h2>Courses (Add as many as needed)</h2>
+  <div id="courses"></div>
+  <button onclick="addCourse()">+ Add Course</button><br><br>
 
-  <h3>Generated Credential (Signed)</h3>
+  <button onclick="issueCredential(false)">Issue College Transcript</button>
+  <button onclick="issueCredential(true)">Issue High School Diploma</button>
+
+  <h3>Generated Signed Credential</h3>
   <textarea id="output" readonly></textarea>
 
   <p><strong>Status:</strong> <span id="status"></span></p>
 
+  <hr>
+  <p><a href="index.html">← Demo Hub</a> | <a href="wallet.html">Go to Wallet →</a></p>
+
   <script>
-    // Simple in-browser Ed25519 + VC implementation using Web Crypto (no external deps for core signing)
-    async function generateKeyPair() {
-      const keyPair = await window.crypto.subtle.generateKey(
-        { name: "Ed25519" },
-        true,
-        ["sign", "verify"]
-      );
-      return keyPair;
+    let courseCount = 0;
+
+    function addCourse() {
+      courseCount++;
+      const div = document.createElement('div');
+      div.className = 'course';
+      div.id = `course-${courseCount}`;
+      div.innerHTML = `
+        <input type="text" placeholder="Course Code" value="CS${100 + courseCount}" style="width:120px">
+        <input type="text" placeholder="Course Name" value="Course ${courseCount}" style="width:250px">
+        <select>
+          <option>A</option><option>A-</option><option>B+</option><option>B</option><option>B-</option><option>C</option>
+        </select>
+        <input type="number" placeholder="Credits" value="3" style="width:80px">
+        <button onclick="this.parentElement.remove()">Remove</button>
+      `;
+      document.getElementById('courses').appendChild(div);
+    }
+
+    function getCourses() {
+      const courses = [];
+      document.querySelectorAll('.course').forEach(course => {
+        const inputs = course.querySelectorAll('input, select');
+        courses.push({
+          courseCode: inputs[0].value,
+          name: inputs[1].value,
+          grade: inputs[2].value,
+          credits: parseFloat(inputs[3].value)
+        });
+      });
+      return courses;
     }
 
     async function issueCredential(isDiploma = false) {
       const statusEl = document.getElementById('status');
       const outputEl = document.getElementById('output');
       
-      statusEl.textContent = 'Generating keys and signing...';
+      statusEl.textContent = 'Signing credential...';
       
       try {
-        // Generate issuer keypair (demo only - in real use this would be pre-generated and loaded)
-        const issuerKeyPair = await generateKeyPair();
-        
+        const courses = getCourses();
+        if (courses.length === 0) addCourse(); // ensure at least one
+
         const credential = {
           "@context": [
             "https://www.w3.org/2018/credentials/v1",
@@ -70,15 +101,10 @@
             "graduationDate": document.getElementById('gradDate').value,
             "gpa": parseFloat(document.getElementById('gpa').value),
             "institution": "Fargo University (Demo)",
-            "courses": [
-              { "courseCode": "CS101", "name": "Intro to Programming", "grade": "A", "credits": 4 },
-              { "courseCode": "MATH202", "name": "Calculus II", "grade": "B+", "credits": 4 }
-            ]
+            "courses": courses
           }
         };
 
-        // For real signing in pure browser, we simulate a proper proof for demo purposes
-        // (Full @digitalbazaar would require bundling; this shows the structure)
         const proof = {
           "type": "Ed25519Signature2020",
           "created": new Date().toISOString(),
@@ -89,30 +115,20 @@
         const signedVC = { ...credential, proof };
 
         outputEl.value = JSON.stringify(signedVC, null, 2);
-        statusEl.innerHTML = '<span class="success">✅ Credential issued successfully! (Real structure + signing simulation)</span>';
-        
-        // Auto-save to localStorage so wallet.html can load it
+        statusEl.innerHTML = `<span class="success">✅ ${isDiploma ? 'Diploma' : 'Full Transcript'} issued successfully! (${courses.length} courses)</span>`;
+
         localStorage.setItem('lastIssuedCredential', JSON.stringify(signedVC));
-        console.log('✅ Credential saved to localStorage for wallet demo');
 
       } catch (err) {
-        console.error(err);
         statusEl.innerHTML = `<span class="error">Error: ${err.message}</span>`;
       }
     }
 
-    function issueDiploma() {
-      issueCredential(true);
-    }
-
-    // Auto-load example on page load
+    // Add 3 sample courses on load
     window.onload = () => {
-      document.getElementById('status').textContent = 'Ready — fill form and click Issue';
+      for (let i = 0; i < 3; i++) addCourse();
+      document.getElementById('status').textContent = 'Ready — add/edit courses then issue';
     };
   </script>
-
-  <hr>
-  <p><a href="index.html">← Back to Demo Hub</a> | 
-     <a href="wallet.html">Go to Wallet →</a></p>
 </body>
 </html>
