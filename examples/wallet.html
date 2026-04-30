@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NeoTranscript Student Wallet</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f8f9fa; }
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; background: #f8f9fa; }
     h1 { color: #0d6efd; }
     .credential { 
       background: white; 
@@ -25,6 +25,7 @@
     }
     .share { background: #198754; color: white; }
     .copy { background: #6c757d; color: white; }
+    label { display: block; margin: 8px 0; }
   </style>
 </head>
 <body>
@@ -35,24 +36,19 @@
     <h3>📜 Bachelor of Science in Computer Science</h3>
     <p><strong>Student:</strong> Alex Rivera</p>
     <p><strong>Institution:</strong> Example University</p>
-    <p><strong>Type:</strong> College Transcript</p>
     <p><strong>GPA:</strong> 3.87 • Graduated: May 15, 2025</p>
-    <button class="share" onclick="shareCredential()">Share Credential</button>
-    <button class="copy" onclick="copyCredential()">Copy JSON for Verifier</button>
-  </div>
 
-  <div class="credential">
-    <h3>🎓 High School Diploma</h3>
-    <p><strong>Student:</strong> Alex Rivera</p>
-    <p><strong>School:</strong> Example High School</p>
-    <p><strong>Type:</strong> High School Diploma</p>
-    <p><strong>Graduated:</strong> June 10, 2023</p>
-    <button class="share" onclick="shareCredential()">Share Credential</button>
-    <button class="copy" onclick="copyCredential()">Copy JSON for Verifier</button>
+    <h4>Selective Disclosure</h4>
+    <label><input type="checkbox" id="shareFull" checked> Share full transcript (including all courses & grades)</label>
+    <label><input type="checkbox" id="shareGPA" checked> Share GPA</label>
+    <label><input type="checkbox" id="shareHonors" checked> Share honors</label>
+
+    <button class="share" onclick="shareCredential()">Share Selected Version</button>
+    <button class="copy" onclick="copyFullCredential()">Copy Full JSON</button>
   </div>
 
   <script>
-    const sampleTranscript = {
+    const fullCredential = {
       "@context": ["https://www.w3.org/ns/credentials/v2"],
       "type": ["VerifiableCredential", "TranscriptCredential"],
       "issuer": "https://example-university.edu",
@@ -63,32 +59,42 @@
         "degree": "Bachelor of Science in Computer Science",
         "major": "Computer Science",
         "gpa": 3.87,
-        "graduationDate": "2025-05-15"
-      }
-    };
-
-    const sampleDiploma = {
-      "@context": ["https://www.w3.org/ns/credentials/v2"],
-      "type": ["VerifiableCredential", "DiplomaCredential"],
-      "issuer": "https://example-high-school.edu",
-      "issuanceDate": "2023-06-10T00:00:00Z",
-      "credentialSubject": {
-        "legalName": "Alexander James Rivera",
-        "preferredName": "Alex Rivera",
-        "diplomaType": "High School Diploma",
-        "gpa": 3.92,
-        "graduationDate": "2023-06-10"
+        "graduationDate": "2025-05-15",
+        "academicHonors": ["Dean's List", "Summa Cum Laude"],
+        "courseRecord": [
+          { "term": "Fall 2024", "courseCode": "CS 301", "courseTitle": "Data Structures", "credits": 4, "grade": "A" },
+          { "term": "Spring 2025", "courseCode": "CS 450", "courseTitle": "Software Engineering", "credits": 3, "grade": "A-" }
+        ]
       }
     };
 
     function shareCredential() {
-      alert("In a real wallet this would generate a secure public link or QR code.\n\nFor demo: Use the Copy JSON button.");
+      const shareFull = document.getElementById('shareFull').checked;
+      const shareGPA = document.getElementById('shareGPA').checked;
+      const shareHonors = document.getElementById('shareHonors').checked;
+
+      let shared = JSON.parse(JSON.stringify(fullCredential));
+
+      if (!shareFull) {
+        delete shared.credentialSubject.courseRecord;
+      }
+      if (!shareGPA) {
+        delete shared.credentialSubject.gpa;
+      }
+      if (!shareHonors) {
+        delete shared.credentialSubject.academicHonors;
+      }
+
+      const json = JSON.stringify(shared, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        alert("✅ Shared version copied to clipboard!\nPaste it into the Verifier Demo.");
+      });
     }
 
-    function copyCredential() {
-      // For simplicity, copy the transcript sample
-      navigator.clipboard.writeText(JSON.stringify(sampleTranscript, null, 2)).then(() => {
-        alert("✅ Transcript JSON copied! Paste into Verifier Demo.");
+    function copyFullCredential() {
+      const json = JSON.stringify(fullCredential, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        alert("✅ Full credential JSON copied to clipboard!");
       });
     }
   </script>
