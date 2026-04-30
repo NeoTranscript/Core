@@ -12,20 +12,38 @@
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
     th { background: #f0f0f0; }
     .scrollable { max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
-    .success { color: green; font-weight: bold; }
+    .selective { background: #f0f8ff; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    input[type="checkbox"] { margin-right: 8px; transform: scale(1.2); }
   </style>
 </head>
 <body>
   <h1>NeoTranscript Student Wallet</h1>
-  <p>You own your credentials. No company or school controls them.</p>
+  <p>You own it. You control what you share.</p>
 
-  <button onclick="loadLastCredential()">Load Latest Issued Credential</button>
+  <button onclick="loadLastCredential()">Load Latest Credential</button>
   <button onclick="clearWallet()">Clear Wallet</button>
 
   <div id="wallet"></div>
 
-  <h3>Raw Credential JSON</h3>
-  <pre id="raw"></pre>
+  <div id="selectiveControls" class="selective" style="display:none;">
+    <h3>Selective Disclosure — Choose what to share</h3>
+    <label><input type="checkbox" id="shareName" checked> Name</label><br>
+    <label><input type="checkbox" id="shareDegree" checked> Degree / Diploma</label><br>
+    <label><input type="checkbox" id="shareGPA" checked> GPA</label><br>
+    <label><input type="checkbox" id="shareGradDate" checked> Graduation Date</label><br>
+    
+    <h4>Courses (select which to include)</h4>
+    <div id="courseCheckboxes"></div>
+    
+    <button onclick="createSharedVersion()">Create Shared Version</button>
+  </div>
+
+  <div id="sharedResult" style="display:none;">
+    <h3>Shared Credential (Ready to Send)</h3>
+    <pre id="sharedJSON"></pre>
+    <button onclick="copyShared()">Copy to Clipboard</button>
+    <button onclick="downloadShared()">Download JSON</button>
+  </div>
 
   <hr>
   <p><a href="index.html">← Demo Hub</a> | 
@@ -38,75 +56,99 @@
     function displayCredential(cred) {
       currentCredential = cred;
       const walletEl = document.getElementById('wallet');
-      const rawEl = document.getElementById('raw');
       const subject = cred.credentialSubject || cred;
-
       const courses = subject.courses || [];
-      let courseHTML = '';
-      
-      if (courses.length > 0) {
-        courseHTML = `
-          <h3>Courses (${courses.length})</h3>
-          <div class="scrollable">
-            <table>
-              <thead>
-                <tr>
-                  <th>Code</th>
-                  <th>Course Name</th>
-                  <th>Grade</th>
-                  <th>Credits</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${courses.map(c => `
-                  <tr>
-                    <td><strong>${c.courseCode}</strong></td>
-                    <td>${c.name}</td>
-                    <td>${c.grade}</td>
-                    <td>${c.credits}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>`;
-      }
 
-      const html = `
+      let html = `
         <div class="card">
           <h2>${subject.name || 'Student'}</h2>
           <p><strong>Institution:</strong> ${subject.institution || 'Fargo University (Demo)'}</p>
-          <p><strong>${cred.type?.includes('HighSchoolDiplomaCredential') ? 'High School Diploma' : 'Degree'}:</strong> ${subject.degree || 'N/A'}</p>
+          <p><strong>Degree:</strong> ${subject.degree || 'N/A'}</p>
           <p><strong>GPA:</strong> ${subject.gpa || 'N/A'}</p>
-          <p><strong>Graduation Date:</strong> ${subject.graduationDate || 'N/A'}</p>
-          <p><strong>Issued:</strong> ${new Date(cred.issuanceDate).toLocaleDateString()}</p>
+          <p><strong>Graduation:</strong> ${subject.graduationDate || 'N/A'}</p>
           
-          ${courseHTML}
+          <h3>Courses (${courses.length})</h3>
+          <div class="scrollable">
+            <table>
+              <thead><tr><th>Code</th><th>Course</th><th>Grade</th><th>Credits</th></tr></thead>
+              <tbody>${courses.map((c,i) => `
+                <tr><td><strong>${c.courseCode}</strong></td><td>${c.name}</td><td>${c.grade}</td><td>${c.credits}</td></tr>
+              `).join('')}</tbody>
+            </table>
+          </div>
         </div>
       `;
 
       walletEl.innerHTML = html;
-      rawEl.textContent = JSON.stringify(cred, null, 2);
+      document.getElementById('selectiveControls').style.display = 'block';
+      renderCourseCheckboxes(courses);
+    }
+
+    function renderCourseCheckboxes(courses) {
+      const container = document.getElementById('courseCheckboxes');
+      container.innerHTML = courses.map((course, i) => `
+        <label><input type="checkbox" class="courseChk" data-index="${i}" checked>
+          ${course.courseCode} — ${course.name} (${course.grade})
+        </label><br>
+      `).join('');
+    }
+
+    function createSharedVersion() {
+      if (!currentCredential) return;
+
+      const subject = {...currentCredential.credentialSubject};
+      const courses = subject.courses || [];
+
+      // Apply field selections
+      if (!document.getElementById('shareName').checked) subject.name = "[REDACTED]";
+      if (!document.getElementById('shareDegree').checked) subject.degree = "[REDACTED]";
+      if (!document.getElementById('shareGPA').checked) delete subject.gpa;
+      if (!document.getElementById('shareGradDate').checked) delete subject.graduationDate;
+
+      // Filter courses
+      const selectedIndices = Array.from(document.querySelectorAll('.courseChk:checked'))
+                                  .map(chk => parseInt(chk.dataset.index));
+      subject.courses = courses.filter((_, i) => selectedIndices.includes(i));
+
+      const sharedVC = {
+        ...currentCredential,
+        credentialSubject: subject,
+        // Add metadata about disclosure
+        disclosureMetadata: {
+          sharedAt: new Date().toISOString(),
+          note: "Student-controlled selective disclosure"
+        }
+      };
+
+      document.getElementById('sharedJSON').textContent = JSON.stringify(sharedVC, null, 2);
+      document.getElementById('sharedResult').style.display = 'block';
+    }
+
+    function copyShared() {
+      const text = document.getElementById('sharedJSON').textContent;
+      navigator.clipboard.writeText(text).then(() => alert("✅ Copied to clipboard!"));
+    }
+
+    function downloadShared() {
+      const text = document.getElementById('sharedJSON').textContent;
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'shared-transcript-credential.json';
+      a.click();
     }
 
     async function loadLastCredential() {
       const saved = localStorage.getItem('lastIssuedCredential');
-      if (!saved) {
-        alert("No credential found. Go to issuer.html first and issue one.");
-        return;
-      }
-      try {
-        const cred = JSON.parse(saved);
-        displayCredential(cred);
-      } catch (e) {
-        alert("Error loading credential: " + e.message);
-      }
+      if (!saved) return alert("No credential found. Issue one first.");
+      displayCredential(JSON.parse(saved));
     }
 
     function clearWallet() {
-      if (confirm("Clear all credentials from this demo wallet?")) {
+      if (confirm("Clear wallet?")) {
         localStorage.removeItem('lastIssuedCredential');
-        document.getElementById('wallet').innerHTML = '<p style="color:#666;">Wallet cleared.</p>';
-        document.getElementById('raw').textContent = '';
+        location.reload();
       }
     }
 
