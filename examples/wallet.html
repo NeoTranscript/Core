@@ -5,10 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NeoTranscript Wallet</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
     button { padding: 12px 20px; margin: 8px 4px; font-size: 16px; }
-    pre { background: #f4f4f4; padding: 15px; overflow: auto; border-radius: 6px; }
     .card { border: 2px solid #4CAF50; padding: 20px; border-radius: 8px; margin: 15px 0; background: #f9fff9; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #f0f0f0; }
+    .scrollable { max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px; }
     .success { color: green; font-weight: bold; }
   </style>
 </head>
@@ -21,12 +24,12 @@
 
   <div id="wallet"></div>
 
-  <h3>Raw Credential (for sharing / debugging)</h3>
+  <h3>Raw Credential JSON</h3>
   <pre id="raw"></pre>
 
   <hr>
   <p><a href="index.html">← Demo Hub</a> | 
-     <a href="issuer.html">← Back to Issuer</a> | 
+     <a href="issuer.html">← Issuer</a> | 
      <a href="verifier.html">Go to Verifier →</a></p>
 
   <script>
@@ -36,10 +39,39 @@
       currentCredential = cred;
       const walletEl = document.getElementById('wallet');
       const rawEl = document.getElementById('raw');
-
       const subject = cred.credentialSubject || cred;
 
-      let html = `
+      const courses = subject.courses || [];
+      let courseHTML = '';
+      
+      if (courses.length > 0) {
+        courseHTML = `
+          <h3>Courses (${courses.length})</h3>
+          <div class="scrollable">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Course Name</th>
+                  <th>Grade</th>
+                  <th>Credits</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${courses.map(c => `
+                  <tr>
+                    <td><strong>${c.courseCode}</strong></td>
+                    <td>${c.name}</td>
+                    <td>${c.grade}</td>
+                    <td>${c.credits}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>`;
+      }
+
+      const html = `
         <div class="card">
           <h2>${subject.name || 'Student'}</h2>
           <p><strong>Institution:</strong> ${subject.institution || 'Fargo University (Demo)'}</p>
@@ -48,14 +80,7 @@
           <p><strong>Graduation Date:</strong> ${subject.graduationDate || 'N/A'}</p>
           <p><strong>Issued:</strong> ${new Date(cred.issuanceDate).toLocaleDateString()}</p>
           
-          <details>
-            <summary>Courses (${subject.courses?.length || 0})</summary>
-            <ul>
-              ${(subject.courses || []).map(c => `
-                <li><strong>${c.courseCode}</strong> — ${c.name} (${c.grade}) — ${c.credits} credits</li>
-              `).join('')}
-            </ul>
-          </details>
+          ${courseHTML}
         </div>
       `;
 
@@ -69,11 +94,9 @@
         alert("No credential found. Go to issuer.html first and issue one.");
         return;
       }
-
       try {
         const cred = JSON.parse(saved);
         displayCredential(cred);
-        document.getElementById('wallet').scrollIntoView({ behavior: "smooth" });
       } catch (e) {
         alert("Error loading credential: " + e.message);
       }
@@ -87,14 +110,9 @@
       }
     }
 
-    // Auto-load if credential exists
     window.onload = () => {
       const saved = localStorage.getItem('lastIssuedCredential');
-      if (saved) {
-        try {
-          displayCredential(JSON.parse(saved));
-        } catch (_) {}
-      }
+      if (saved) displayCredential(JSON.parse(saved));
     };
   </script>
 </body>
