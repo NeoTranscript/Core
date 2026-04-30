@@ -1,19 +1,17 @@
 {
-  "name": "neotranscript",
-  "version": "0.2.0",
-  "description": "Student-owned cryptographic transcripts using W3C Verifiable Credentials",
-  "main": "src/issuer/index.js",
+  "name": "neotranscript-core",
+  "version": "0.1.0",
+  "description": "Student-owned verifiable transcripts",
+  "type": "module",
   "scripts": {
-    "issuer": "node src/issuer/index.js",
-    "dev": "node src/issuer/index.js",
-    "test": "echo \"Tests coming soon\""
+    "issuer": "node src/issuer/real-issuer.js",
+    "test-issuer": "node -e 'import(\"./src/issuer/real-issuer.js\").then(m => m.test())'",
+    "dev": "echo 'Backend dev coming soon'"
   },
   "dependencies": {
-    "@digitalcredentials/vc": "^5.0.0",
-    "@digitalcredentials/ed25519-signature-2020": "^4.0.0",
-    "@digitalcredentials/ed25519-verification-key-2020": "^4.0.0",
-    "uuid": "^10.0.0"
-  },
-  "author": "Alec Tolson",
-  "license": "MIT"
+    "@digitalbazaar/vc": "^6.0.0",
+    "@digitalbazaar/ed25519-verification-key-2020": "^4.0.0",
+    "@digitalbazaar/ed25519-signature-2020": "^4.0.0",
+    "@digitalbazaar/did-method-key": "^3.0.0"
+  }
 }
