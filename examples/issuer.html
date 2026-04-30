@@ -5,40 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NeoTranscript Issuer Demo — Full Transcript Builder</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    body { font-family: system-ui, sans-serif; max-width: 1000px; margin: 40px auto; padding: 20px; line-height: 1.6; }
     input, select, button, textarea { padding: 10px; margin: 5px; font-size: 16px; }
     button { cursor: pointer; }
     .course { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fafafa; }
     textarea { width: 100%; height: 120px; font-family: monospace; }
     .success { color: green; }
     .error { color: red; }
+    .field-group { margin-bottom: 15px; }
   </style>
 </head>
 <body>
-  <h1>NeoTranscript Issuer Demo — Full Transcript Builder</h1>
-  <p>Build rich transcripts. Use manual mode or quick paste.</p>
+  <h1>NeoTranscript Issuer Demo — Rich Transcript Builder</h1>
+  <p>Build professional college transcripts or high school diplomas with full details.</p>
 
-  <h2>Student Info</h2>
-  <label>Name: <input type="text" id="name" value="Alex Rivera"></label><br>
-  <label>Student ID: <input type="text" id="studentId" value="S12345"></label><br>
-  <label>Degree / Diploma: <input type="text" id="degree" value="BS Computer Science"></label><br>
-  <label>GPA: <input type="number" id="gpa" value="3.87" step="0.01"></label><br>
-  <label>Graduation Date: <input type="date" id="gradDate" value="2025-05-15"></label><br><br>
+  <h2>Student & Credential Info</h2>
+  <div class="field-group">
+    <label>Name: <input type="text" id="name" value="Alex Rivera"></label><br>
+    <label>Student ID: <input type="text" id="studentId" value="S12345"></label><br>
+    <label>Major / Program: <input type="text" id="major" value="Computer Science"></label><br>
+    <label>Degree / Diploma: <input type="text" id="degree" value="Bachelor of Science"></label><br>
+    <label>GPA: <input type="number" id="gpa" value="3.87" step="0.01"></label><br>
+    <label>Graduation Date: <input type="date" id="gradDate" value="2025-05-15"></label><br>
+    <label>Honors: <input type="text" id="honors" value="Magna Cum Laude" placeholder="e.g. Summa Cum Laude, Dean's List"></label><br>
+  </div>
+
+  <h2>Term / Semester Info (Optional)</h2>
+  <div class="field-group">
+    <label>Term: <input type="text" id="term" value="Spring 2025" placeholder="e.g. Fall 2024"></label>
+  </div>
 
   <h2>Courses</h2>
   
   <!-- Quick Paste -->
-  <details>
-    <summary><strong>Quick Paste Courses (CSV or JSON) — Recommended for many courses</strong></summary>
-    <textarea id="pasteInput" placeholder="Paste CSV here... Example:
-CS101,Intro to Programming,A,4
-MATH202,Calculus II,B+,4"></textarea><br>
+  <details open>
+    <summary><strong>Quick Paste Courses (CSV) — Great for bulk import</strong></summary>
+    <textarea id="pasteInput" placeholder="Format: CourseCode,CourseName,Grade,Credits"></textarea><br>
     <button onclick="importCourses()">Import Pasted Courses</button>
-    <button onclick="clearPaste()">Clear Paste</button>
+    <button onclick="clearPaste()">Clear</button>
   </details>
 
   <!-- Manual Builder -->
-  <h3>Or Build Manually</h3>
+  <h3>Or Build/Edit Manually</h3>
   <div id="courses"></div>
   <button onclick="addCourse()">+ Add Course</button><br><br>
 
@@ -60,13 +68,10 @@ MATH202,Calculus II,B+,4"></textarea><br>
       courseCount++;
       const div = document.createElement('div');
       div.className = 'course';
-      div.id = `course-${courseCount}`;
       div.innerHTML = `
         <input type="text" placeholder="Course Code" value="CS${100 + courseCount}" style="width:120px">
-        <input type="text" placeholder="Course Name" value="Course ${courseCount}" style="width:250px">
-        <select>
-          <option>A</option><option>A-</option><option>B+</option><option>B</option><option>B-</option><option>C</option>
-        </select>
+        <input type="text" placeholder="Course Name" value="Advanced Course ${courseCount}" style="width:280px">
+        <select><option>A</option><option>A-</option><option>B+</option><option>B</option><option>B-</option><option>C</option></select>
         <input type="number" placeholder="Credits" value="3" style="width:80px">
         <button onclick="this.parentElement.remove()">Remove</button>
       `;
@@ -77,7 +82,7 @@ MATH202,Calculus II,B+,4"></textarea><br>
       const courses = [];
       document.querySelectorAll('.course').forEach(course => {
         const inputs = course.querySelectorAll('input, select');
-        if (inputs[0].value) {
+        if (inputs[0].value.trim()) {
           courses.push({
             courseCode: inputs[0].value,
             name: inputs[1].value,
@@ -92,7 +97,6 @@ MATH202,Calculus II,B+,4"></textarea><br>
     function importCourses() {
       const text = document.getElementById('pasteInput').value.trim();
       if (!text) return;
-
       const lines = text.split('\n');
       lines.forEach(line => {
         if (!line.trim()) return;
@@ -102,16 +106,15 @@ MATH202,Calculus II,B+,4"></textarea><br>
           div.className = 'course';
           div.innerHTML = `
             <input type="text" value="${parts[0]}" style="width:120px">
-            <input type="text" value="${parts[1]}" style="width:250px">
-            <select><option>${parts[2]}</option></select>
+            <input type="text" value="${parts[1]}" style="width:280px">
+            <select><option selected>${parts[2]}</option></select>
             <input type="number" value="${parts[3] || 3}" style="width:80px">
             <button onclick="this.parentElement.remove()">Remove</button>
           `;
           document.getElementById('courses').appendChild(div);
         }
       });
-
-      document.getElementById('status').innerHTML = `<span class="success">Courses imported!</span>`;
+      document.getElementById('status').innerHTML = `<span class="success">✅ Courses imported</span>`;
     }
 
     function clearPaste() {
@@ -122,10 +125,10 @@ MATH202,Calculus II,B+,4"></textarea><br>
       const statusEl = document.getElementById('status');
       const outputEl = document.getElementById('output');
       
-      statusEl.textContent = 'Signing credential...';
+      statusEl.textContent = 'Creating credential...';
       
       try {
-        let courses = getCourses();
+        const courses = getCourses();
         if (courses.length === 0) addCourse();
 
         const credential = {
@@ -138,19 +141,28 @@ MATH202,Calculus II,B+,4"></textarea><br>
             "id": `did:key:z${Math.random().toString(36).substring(2)}`,
             "name": document.getElementById('name').value,
             "studentId": document.getElementById('studentId').value,
+            "major": document.getElementById('major').value,
             "degree": document.getElementById('degree').value,
-            "graduationDate": document.getElementById('gradDate').value,
             "gpa": parseFloat(document.getElementById('gpa').value),
+            "graduationDate": document.getElementById('gradDate').value,
+            "honors": document.getElementById('honors').value || null,
             "institution": "Fargo University (Demo)",
+            "term": document.getElementById('term').value || null,
             "courses": courses
           }
         };
 
-        const proof = { "type": "Ed25519Signature2020", "created": new Date().toISOString(), "verificationMethod": "https://neotranscript.org/issuers/fargo-university#key-1", "proofPurpose": "assertionMethod" };
+        const proof = {
+          "type": "Ed25519Signature2020",
+          "created": new Date().toISOString(),
+          "verificationMethod": "https://neotranscript.org/issuers/fargo-university#key-1",
+          "proofPurpose": "assertionMethod"
+        };
+
         const signedVC = { ...credential, proof };
 
         outputEl.value = JSON.stringify(signedVC, null, 2);
-        statusEl.innerHTML = `<span class="success">✅ ${isDiploma ? 'Diploma' : 'Transcript'} issued with ${courses.length} courses!</span>`;
+        statusEl.innerHTML = `<span class="success">✅ ${isDiploma ? 'High School Diploma' : 'College Transcript'} issued successfully! (${courses.length} courses)</span>`;
 
         localStorage.setItem('lastIssuedCredential', JSON.stringify(signedVC));
 
@@ -159,10 +171,10 @@ MATH202,Calculus II,B+,4"></textarea><br>
       }
     }
 
-    // Initialize with 3 sample courses
+    // Initialize with sample data
     window.onload = () => {
-      for (let i = 0; i < 3; i++) addCourse();
-      document.getElementById('status').textContent = 'Ready — use Paste or Manual builder';
+      for (let i = 0; i < 4; i++) addCourse();
+      document.getElementById('status').textContent = 'Ready — use paste or manual builder';
     };
   </script>
 </body>
