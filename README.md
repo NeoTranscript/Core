@@ -1,57 +1,65 @@
 # NeoTranscript
 
-**Student-Owned Cryptographic Transcripts & Diplomas**
+**Students own their transcripts and diplomas.**
 
-A standards-based, open-source replacement for centralized verification gatekeepers like the National Student Clearinghouse.
+A new system where academic credentials are issued as W3C Verifiable Credentials, signed by schools, and fully controlled by students using their own keys.
 
-Students own their records via public-private keys. Colleges and high schools sign once. Employers verify instantly — no forms, no fees, no middlemen.
+No more dependency on centralized services like the National Student Clearinghouse. Students can share exactly what they want, when they want.
 
-### Try the Live Demos
+## Live Demo (Works in Browser — No Install Needed)
 
-**[→ Open Demo Hub](https://neotranscript.github.io/Core/examples/index.html)**
+- **[Demo Hub](https://neotranscript.github.io/Core/examples/index.html)**  
+- **[1. Issuer Demo](https://neotranscript.github.io/Core/examples/issuer.html)** — Create rich transcripts & diplomas  
+- **[2. Student Wallet](https://neotranscript.github.io/Core/examples/wallet.html)** — View, selective disclosure, PDF export  
+- **[3. Verifier](https://neotranscript.github.io/Core/examples/verifier.html)** — Anyone can verify instantly
 
-- Issuer Demo (College + High School)
-- Student Wallet
-- Verifier Demo
+## Current Features
 
-### Getting Started (Local Development)
+- Rich transcript builder with full course records
+- Quick CSV paste support (easy import from Excel/SIS)
+- High School Diploma credential type
+- Major, GPA, Honors, Term/Semester fields
+- Student-controlled selective disclosure (hide GPA, specific courses, etc.)
+- Professional PDF transcript export
+- Clean Issuer → Wallet → Verifier flow
+- Mobile-friendly design
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/neotranscript/Core.git
-cd Core
+## Project Vision
 
-# 2. Install dependencies
-npm install
+- Students truly own their academic record using public-private keys
+- Schools issue cryptographically signed credentials
+- Employers/verifiers can instantly check authenticity without contacting the school
+- Hybrid long-term proof using Bitcoin (optional anchoring)
+- Works for both college transcripts and high school diplomas
 
-# 3. Generate sample credentials
-npm run issuer
+## Getting Started
 
-# 4. Open the demos
-# Just open examples/index.html in your browser
-```
-### Key Features
+1. Visit the [Demo Hub](https://neotranscript.github.io/Core/examples/index.html) to try it immediately
+2. Clone the repo locally:
+   - Go to https://github.com/neotranscript/Core
+   - Click "Code" → Download ZIP or use git clone
+3. Open any file in the `examples/` folder in your browser
 
-- Support for both college transcripts and high school diplomas
-- Full course-level detail with selective disclosure
-- NSC Onboarding Bridge for easy migration
-- Built on W3C Verifiable Credentials + open standards
-- Bitcoin L2 + mainnet anchoring planned for long-term security
+## Roadmap
 
-### Links
+- Real cryptographic signing using `@digitalbazaar/vc`
+- Proper DID and key management
+- JSON-LD context and full schema validation
+- Bitcoin L2 + mainnet anchoring
+- Backend issuer service
+- First pilot with local schools (NDSU, Concordia, Fargo Public Schools)
 
-- **[Whitepaper](WHITEPAPER.md)**
-- **[MVP Specification](MVP-SPEC.md)**
-- **[Architecture Decisions](docs/architecture.md)**
-- **[Project Roadmap](https://github.com/orgs/neotranscript/projects)**
-- **[Discussions](https://github.com/neotranscript/Core/discussions)**
+## Tech (Current Demo)
+
+- Pure browser JavaScript
+- W3C Verifiable Credentials format
+- jsPDF for PDF generation
+- LocalStorage for demo flow between pages
 
 ---
 
-**Status**: Early MVP — Interactive demos live · Backend issuer script ready
+**Built for student autonomy and institutional efficiency.**
 
-**Want to help?**  
-- Star the repo ⭐  
-- Try the demos and leave feedback  
-- Open Issues or join Discussions  
-- Share with colleges, high schools, or edtech contacts
+**Repository**: [github.com/neotranscript/Core](https://github.com/neotranscript/Core)  
+**Author**: Alec Tolson (@AlTols)  
+**Date**: April 30, 2026
