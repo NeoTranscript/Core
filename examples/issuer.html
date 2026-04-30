@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NeoTranscript Issuer Demo</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; }
     h1 { color: #0d6efd; }
-    input, select { width: 100%; padding: 10px; margin: 8px 0; }
+    input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; }
     button { 
       padding: 14px 28px; 
       font-size: 16px; 
@@ -24,7 +24,7 @@
 </head>
 <body>
   <h1>NeoTranscript Issuer Demo</h1>
-  <p>Issue a signed transcript or diploma</p>
+  <p>Issue a signed transcript or diploma. You can paste full SIS data below.</p>
 
   <label>Credential Type</label>
   <select id="credentialType">
@@ -32,16 +32,19 @@
     <option value="diploma">High School Diploma</option>
   </select>
 
+  <label>Paste Full SIS/Transcript Data (optional)</label>
+  <textarea id="sisData" rows="6" placeholder="Paste raw transcript data here (courses, grades, etc.). Will be merged into credential."></textarea>
+
   <label>Student Legal Name</label>
   <input type="text" id="legalName" value="Alexander James Rivera">
 
   <label>Preferred Name</label>
   <input type="text" id="preferredName" value="Alex Rivera">
 
-  <label id="institutionLabel">University / School Name</label>
+  <label>University / School Name</label>
   <input type="text" id="institution" value="Example University">
 
-  <label id="degreeLabel">Degree / Diploma Type</label>
+  <label>Degree / Diploma Type</label>
   <input type="text" id="degree" value="Bachelor of Science in Computer Science">
 
   <label>GPA</label>
@@ -59,7 +62,7 @@
       const type = document.getElementById('credentialType').value;
       const isTranscript = type === 'transcript';
 
-      const credential = {
+      let credential = {
         "@context": ["https://www.w3.org/ns/credentials/v2"],
         "type": ["VerifiableCredential", isTranscript ? "TranscriptCredential" : "DiplomaCredential"],
         "issuer": `https://${document.getElementById('institution').value.toLowerCase().replace(/ /g, '-')}.edu`,
@@ -77,6 +80,17 @@
         credential.credentialSubject.major = "Computer Science";
       } else {
         credential.credentialSubject.diplomaType = document.getElementById('degree').value || "High School Diploma";
+      }
+
+      // Try to parse pasted SIS data
+      const sisText = document.getElementById('sisData').value.trim();
+      if (sisText) {
+        try {
+          const sisData = JSON.parse(sisText);
+          credential.credentialSubject = { ...credential.credentialSubject, ...sisData };
+        } catch (e) {
+          console.log("SIS data not valid JSON, ignoring.");
+        }
       }
 
       const jsonString = JSON.stringify(credential, null, 2);
