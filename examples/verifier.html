@@ -10,7 +10,8 @@
     textarea { width: 100%; height: 200px; font-family: monospace; }
     .card { border: 2px solid #4CAF50; padding: 20px; border-radius: 8px; margin: 15px 0; background: #f9fff9; }
     .success { color: green; font-weight: bold; font-size: 1.3em; }
-    .fail { color: red; font-weight: bold; }
+    .warning { color: orange; }
+    .redacted { color: #888; font-style: italic; }
     table { width: 100%; border-collapse: collapse; margin: 15px 0; }
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
     th { background: #f0f0f0; }
@@ -19,13 +20,13 @@
 </head>
 <body>
   <h1>NeoTranscript Verifier</h1>
-  <p>Instant, trustworthy verification of student-owned credentials.</p>
+  <p>Verifies both full and selectively disclosed credentials.</p>
 
-  <button onclick="loadFromLocalStorage()">Load Latest Credential from Wallet</button>
+  <button onclick="loadFromLocalStorage()">Load Latest Shared Credential</button>
   <button onclick="clearVerification()">Clear</button>
 
-  <h3>Paste Credential JSON (optional)</h3>
-  <textarea id="input" placeholder="Paste full credential JSON here..."></textarea><br>
+  <h3>Or paste credential JSON here:</h3>
+  <textarea id="input" placeholder="Paste any credential (full or shared) here..."></textarea><br>
   <button onclick="verifyCredential()">Verify Credential</button>
 
   <div id="result"></div>
@@ -49,17 +50,22 @@
         } else if (saved) {
           cred = JSON.parse(saved);
         } else {
-          throw new Error("No credential available");
+          throw new Error("No credential to verify");
         }
 
         const subject = cred.credentialSubject || cred;
         const courses = subject.courses || [];
         const isValid = !!(cred.proof && cred.issuer);
 
+        let disclosureNote = '';
+        if (cred.disclosureMetadata) {
+          disclosureNote = `<p class="warning">⚠️ This is a selectively disclosed version (shared ${new Date(cred.disclosureMetadata.sharedAt).toLocaleString()})</p>`;
+        }
+
         let courseHTML = '';
         if (courses.length > 0) {
           courseHTML = `
-            <h3>Courses (${courses.length})</h3>
+            <h3>Courses Included (${courses.length})</h3>
             <div class="scrollable">
               <table>
                 <thead><tr><th>Code</th><th>Course Name</th><th>Grade</th><th>Credits</th></tr></thead>
@@ -75,18 +81,25 @@
                 </tbody>
               </table>
             </div>`;
+        } else if (subject.courses && subject.courses.length === 0) {
+          courseHTML = `<p class="redacted">No courses shared in this version</p>`;
         }
 
         const html = `
           <div class="card">
             <h2>Verification Result</h2>
-            ${isValid ? '<p class="success">✅ VALID CREDENTIAL</p>' : '<p class="fail">❌ INVALID</p>'}
+            ${isValid ? '<p class="success">✅ VALID CREDENTIAL</p>' : '<p style="color:red;">❌ INVALID</p>'}
+            
+            ${disclosureNote}
             
             <p><strong>Issuer:</strong> ${cred.issuer}</p>
             <p><strong>Issued:</strong> ${new Date(cred.issuanceDate).toLocaleDateString()}</p>
-            <p><strong>Holder:</strong> ${subject.name || 'Unknown'}</p>
-            <p><strong>GPA:</strong> ${subject.gpa || 'N/A'}</p>
-            <p><strong>${cred.type?.includes('HighSchoolDiplomaCredential') ? 'Diploma' : 'Degree'}:</strong> ${subject.degree || 'N/A'}</p>
+            
+            <h3>Disclosed Information</h3>
+            <p><strong>Name:</strong> ${subject.name || '<span class="redacted">[REDACTED]</span>'}</p>
+            <p><strong>Degree:</strong> ${subject.degree || '<span class="redacted">[REDACTED]</span>'}</p>
+            <p><strong>GPA:</strong> ${subject.gpa !== undefined ? subject.gpa : '<span class="redacted">[HIDDEN]</span>'}</p>
+            <p><strong>Graduation Date:</strong> ${subject.graduationDate || '<span class="redacted">[HIDDEN]</span>'}</p>
             
             ${courseHTML}
           </div>
@@ -97,7 +110,7 @@
       } catch (err) {
         resultEl.innerHTML = `
           <div class="card" style="border-color:#f44336;">
-            <p class="fail">❌ Verification Failed</p>
+            <p style="color:red;">❌ Verification Failed</p>
             <p>${err.message}</p>
           </div>`;
       }
@@ -111,6 +124,15 @@
     function clearVerification() {
       document.getElementById('result').innerHTML = '';
     }
+
+    // Auto prompt if credential exists
+    window.onload = () => {
+      const saved = localStorage.getItem('lastIssuedCredential');
+      if (saved) {
+        document.getElementById('result').innerHTML = 
+          '<p style="color:#666;">Click "Load Latest Shared Credential" to verify.</p>';
+      }
+    };
   </script>
 </body>
 </html>
