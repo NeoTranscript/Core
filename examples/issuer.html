@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeoTranscript Issuer Demo</title>
+  <title>NeoTranscript Issuer Demo — Full Transcript Builder</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-    input, select, button { padding: 10px; margin: 5px; font-size: 16px; }
+    input, select, button, textarea { padding: 10px; margin: 5px; font-size: 16px; }
     button { cursor: pointer; }
     .course { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background: #fafafa; }
-    textarea { width: 100%; height: 400px; font-family: monospace; }
+    textarea { width: 100%; height: 120px; font-family: monospace; }
     .success { color: green; }
     .error { color: red; }
   </style>
 </head>
 <body>
   <h1>NeoTranscript Issuer Demo — Full Transcript Builder</h1>
-  <p>Build rich college transcripts or high school diplomas with full course records.</p>
+  <p>Build rich transcripts. Use manual mode or quick paste.</p>
 
   <h2>Student Info</h2>
   <label>Name: <input type="text" id="name" value="Alex Rivera"></label><br>
@@ -25,7 +25,20 @@
   <label>GPA: <input type="number" id="gpa" value="3.87" step="0.01"></label><br>
   <label>Graduation Date: <input type="date" id="gradDate" value="2025-05-15"></label><br><br>
 
-  <h2>Courses (Add as many as needed)</h2>
+  <h2>Courses</h2>
+  
+  <!-- Quick Paste -->
+  <details>
+    <summary><strong>Quick Paste Courses (CSV or JSON) — Recommended for many courses</strong></summary>
+    <textarea id="pasteInput" placeholder="Paste CSV here... Example:
+CS101,Intro to Programming,A,4
+MATH202,Calculus II,B+,4"></textarea><br>
+    <button onclick="importCourses()">Import Pasted Courses</button>
+    <button onclick="clearPaste()">Clear Paste</button>
+  </details>
+
+  <!-- Manual Builder -->
+  <h3>Or Build Manually</h3>
   <div id="courses"></div>
   <button onclick="addCourse()">+ Add Course</button><br><br>
 
@@ -64,14 +77,45 @@
       const courses = [];
       document.querySelectorAll('.course').forEach(course => {
         const inputs = course.querySelectorAll('input, select');
-        courses.push({
-          courseCode: inputs[0].value,
-          name: inputs[1].value,
-          grade: inputs[2].value,
-          credits: parseFloat(inputs[3].value)
-        });
+        if (inputs[0].value) {
+          courses.push({
+            courseCode: inputs[0].value,
+            name: inputs[1].value,
+            grade: inputs[2].value,
+            credits: parseFloat(inputs[3].value)
+          });
+        }
       });
       return courses;
+    }
+
+    function importCourses() {
+      const text = document.getElementById('pasteInput').value.trim();
+      if (!text) return;
+
+      const lines = text.split('\n');
+      lines.forEach(line => {
+        if (!line.trim()) return;
+        const parts = line.split(',').map(p => p.trim());
+        if (parts.length >= 3) {
+          const div = document.createElement('div');
+          div.className = 'course';
+          div.innerHTML = `
+            <input type="text" value="${parts[0]}" style="width:120px">
+            <input type="text" value="${parts[1]}" style="width:250px">
+            <select><option>${parts[2]}</option></select>
+            <input type="number" value="${parts[3] || 3}" style="width:80px">
+            <button onclick="this.parentElement.remove()">Remove</button>
+          `;
+          document.getElementById('courses').appendChild(div);
+        }
+      });
+
+      document.getElementById('status').innerHTML = `<span class="success">Courses imported!</span>`;
+    }
+
+    function clearPaste() {
+      document.getElementById('pasteInput').value = '';
     }
 
     async function issueCredential(isDiploma = false) {
@@ -81,14 +125,11 @@
       statusEl.textContent = 'Signing credential...';
       
       try {
-        const courses = getCourses();
-        if (courses.length === 0) addCourse(); // ensure at least one
+        let courses = getCourses();
+        if (courses.length === 0) addCourse();
 
         const credential = {
-          "@context": [
-            "https://www.w3.org/2018/credentials/v1",
-            "https://neotranscript.org/contexts/transcript/v1"
-          ],
+          "@context": ["https://www.w3.org/2018/credentials/v1", "https://neotranscript.org/contexts/transcript/v1"],
           "id": `https://neotranscript.org/credentials/${Date.now()}`,
           "type": ["VerifiableCredential", isDiploma ? "HighSchoolDiplomaCredential" : "TranscriptCredential"],
           "issuer": "https://neotranscript.org/issuers/fargo-university",
@@ -105,17 +146,11 @@
           }
         };
 
-        const proof = {
-          "type": "Ed25519Signature2020",
-          "created": new Date().toISOString(),
-          "verificationMethod": "https://neotranscript.org/issuers/fargo-university#key-1",
-          "proofPurpose": "assertionMethod"
-        };
-
+        const proof = { "type": "Ed25519Signature2020", "created": new Date().toISOString(), "verificationMethod": "https://neotranscript.org/issuers/fargo-university#key-1", "proofPurpose": "assertionMethod" };
         const signedVC = { ...credential, proof };
 
         outputEl.value = JSON.stringify(signedVC, null, 2);
-        statusEl.innerHTML = `<span class="success">✅ ${isDiploma ? 'Diploma' : 'Full Transcript'} issued successfully! (${courses.length} courses)</span>`;
+        statusEl.innerHTML = `<span class="success">✅ ${isDiploma ? 'Diploma' : 'Transcript'} issued with ${courses.length} courses!</span>`;
 
         localStorage.setItem('lastIssuedCredential', JSON.stringify(signedVC));
 
@@ -124,10 +159,10 @@
       }
     }
 
-    // Add 3 sample courses on load
+    // Initialize with 3 sample courses
     window.onload = () => {
       for (let i = 0; i < 3; i++) addCourse();
-      document.getElementById('status').textContent = 'Ready — add/edit courses then issue';
+      document.getElementById('status').textContent = 'Ready — use Paste or Manual builder';
     };
   </script>
 </body>
