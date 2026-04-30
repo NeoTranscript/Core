@@ -30,27 +30,28 @@ npm run issuer
 # 4. Open the demos
 # Just open examples/index.html in your browser
 ```
-Key Features
+### Key Features
 
-Support for both college transcripts and high school diplomas
-Full course-level detail with selective disclosure
-NSC Onboarding Bridge for easy migration
-Built on W3C Verifiable Credentials + open standards
-Bitcoin L2 + mainnet anchoring planned for long-term security
+- Support for both college transcripts and high school diplomas
+- Full course-level detail with selective disclosure
+- NSC Onboarding Bridge for easy migration
+- Built on W3C Verifiable Credentials + open standards
+- Bitcoin L2 + mainnet anchoring planned for long-term security
 
-Links
+### Links
 
-Whitepaper
-MVP Specification
-Architecture Decisions
-Project Roadmap
-Discussions
+- **[Whitepaper](WHITEPAPER.md)**
+- **[MVP Specification](MVP-SPEC.md)**
+- **[Architecture Decisions](docs/architecture.md)**
+- **[Project Roadmap](https://github.com/orgs/neotranscript/projects)**
+- **[Discussions](https://github.com/neotranscript/Core/discussions)**
 
+---
 
-Status: Early MVP — Interactive demos live · Backend issuer script ready
-Want to help?
+**Status**: Early MVP — Interactive demos live · Backend issuer script ready
 
-Star the repo ⭐
-Try the demos and leave feedback
-Open Issues or join Discussions
-Share with colleges, high schools, or edtech contacts
+**Want to help?**  
+- Star the repo ⭐  
+- Try the demos and leave feedback  
+- Open Issues or join Discussions  
+- Share with colleges, high schools, or edtech contacts
