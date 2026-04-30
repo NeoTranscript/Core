@@ -3,100 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NeoTranscript Student Wallet</title>
+  <title>NeoTranscript Wallet</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; background: #f8f9fa; }
-    h1 { color: #0d6efd; }
-    .credential { 
-      background: white; 
-      border: 1px solid #ddd; 
-      padding: 20px; 
-      margin: 20px 0; 
-      border-radius: 12px; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    button { 
-      padding: 14px 24px; 
-      font-size: 16px; 
-      margin: 8px 4px; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-    }
-    .share { background: #198754; color: white; }
-    .copy { background: #6c757d; color: white; }
-    label { display: block; margin: 8px 0; }
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+    button { padding: 12px 20px; margin: 8px 4px; font-size: 16px; }
+    pre { background: #f4f4f4; padding: 15px; overflow: auto; border-radius: 6px; }
+    .card { border: 2px solid #4CAF50; padding: 20px; border-radius: 8px; margin: 15px 0; background: #f9fff9; }
+    .success { color: green; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>🪪 My NeoTranscript Wallet</h1>
-  <p>Your transcripts and diplomas. Your control.</p>
+  <h1>NeoTranscript Student Wallet</h1>
+  <p>You own your credentials. No company or school controls them.</p>
 
-  <div class="credential">
-    <h3>📜 Bachelor of Science in Computer Science</h3>
-    <p><strong>Student:</strong> Alex Rivera</p>
-    <p><strong>Institution:</strong> Example University</p>
-    <p><strong>GPA:</strong> 3.87 • Graduated: May 15, 2025</p>
+  <button onclick="loadLastCredential()">Load Latest Issued Credential</button>
+  <button onclick="clearWallet()">Clear Wallet</button>
 
-    <h4>Selective Disclosure</h4>
-    <label><input type="checkbox" id="shareFull" checked> Share full transcript (including all courses & grades)</label>
-    <label><input type="checkbox" id="shareGPA" checked> Share GPA</label>
-    <label><input type="checkbox" id="shareHonors" checked> Share honors</label>
+  <div id="wallet"></div>
 
-    <button class="share" onclick="shareCredential()">Share Selected Version</button>
-    <button class="copy" onclick="copyFullCredential()">Copy Full JSON</button>
-  </div>
+  <h3>Raw Credential (for sharing / debugging)</h3>
+  <pre id="raw"></pre>
+
+  <hr>
+  <p><a href="index.html">← Demo Hub</a> | 
+     <a href="issuer.html">← Back to Issuer</a> | 
+     <a href="verifier.html">Go to Verifier →</a></p>
 
   <script>
-    const fullCredential = {
-      "@context": ["https://www.w3.org/ns/credentials/v2"],
-      "type": ["VerifiableCredential", "TranscriptCredential"],
-      "issuer": "https://example-university.edu",
-      "issuanceDate": "2025-05-20T00:00:00Z",
-      "credentialSubject": {
-        "legalName": "Alexander James Rivera",
-        "preferredName": "Alex Rivera",
-        "degree": "Bachelor of Science in Computer Science",
-        "major": "Computer Science",
-        "gpa": 3.87,
-        "graduationDate": "2025-05-15",
-        "academicHonors": ["Dean's List", "Summa Cum Laude"],
-        "courseRecord": [
-          { "term": "Fall 2024", "courseCode": "CS 301", "courseTitle": "Data Structures", "credits": 4, "grade": "A" },
-          { "term": "Spring 2025", "courseCode": "CS 450", "courseTitle": "Software Engineering", "credits": 3, "grade": "A-" }
-        ]
+    let currentCredential = null;
+
+    function displayCredential(cred) {
+      currentCredential = cred;
+      const walletEl = document.getElementById('wallet');
+      const rawEl = document.getElementById('raw');
+
+      const subject = cred.credentialSubject || cred;
+
+      let html = `
+        <div class="card">
+          <h2>${subject.name || 'Student'}</h2>
+          <p><strong>Institution:</strong> ${subject.institution || 'Fargo University (Demo)'}</p>
+          <p><strong>${cred.type?.includes('HighSchoolDiplomaCredential') ? 'High School Diploma' : 'Degree'}:</strong> ${subject.degree || 'N/A'}</p>
+          <p><strong>GPA:</strong> ${subject.gpa || 'N/A'}</p>
+          <p><strong>Graduation Date:</strong> ${subject.graduationDate || 'N/A'}</p>
+          <p><strong>Issued:</strong> ${new Date(cred.issuanceDate).toLocaleDateString()}</p>
+          
+          <details>
+            <summary>Courses (${subject.courses?.length || 0})</summary>
+            <ul>
+              ${(subject.courses || []).map(c => `
+                <li><strong>${c.courseCode}</strong> — ${c.name} (${c.grade}) — ${c.credits} credits</li>
+              `).join('')}
+            </ul>
+          </details>
+        </div>
+      `;
+
+      walletEl.innerHTML = html;
+      rawEl.textContent = JSON.stringify(cred, null, 2);
+    }
+
+    async function loadLastCredential() {
+      const saved = localStorage.getItem('lastIssuedCredential');
+      if (!saved) {
+        alert("No credential found. Go to issuer.html first and issue one.");
+        return;
+      }
+
+      try {
+        const cred = JSON.parse(saved);
+        displayCredential(cred);
+        document.getElementById('wallet').scrollIntoView({ behavior: "smooth" });
+      } catch (e) {
+        alert("Error loading credential: " + e.message);
+      }
+    }
+
+    function clearWallet() {
+      if (confirm("Clear all credentials from this demo wallet?")) {
+        localStorage.removeItem('lastIssuedCredential');
+        document.getElementById('wallet').innerHTML = '<p style="color:#666;">Wallet cleared.</p>';
+        document.getElementById('raw').textContent = '';
+      }
+    }
+
+    // Auto-load if credential exists
+    window.onload = () => {
+      const saved = localStorage.getItem('lastIssuedCredential');
+      if (saved) {
+        try {
+          displayCredential(JSON.parse(saved));
+        } catch (_) {}
       }
     };
-
-    function shareCredential() {
-      const shareFull = document.getElementById('shareFull').checked;
-      const shareGPA = document.getElementById('shareGPA').checked;
-      const shareHonors = document.getElementById('shareHonors').checked;
-
-      let shared = JSON.parse(JSON.stringify(fullCredential));
-
-      if (!shareFull) {
-        delete shared.credentialSubject.courseRecord;
-      }
-      if (!shareGPA) {
-        delete shared.credentialSubject.gpa;
-      }
-      if (!shareHonors) {
-        delete shared.credentialSubject.academicHonors;
-      }
-
-      const json = JSON.stringify(shared, null, 2);
-      navigator.clipboard.writeText(json).then(() => {
-        alert("✅ Shared version copied to clipboard!\nPaste it into the Verifier Demo.");
-      });
-    }
-
-    function copyFullCredential() {
-      const json = JSON.stringify(fullCredential, null, 2);
-      navigator.clipboard.writeText(json).then(() => {
-        alert("✅ Full credential JSON copied to clipboard!");
-      });
-    }
   </script>
 </body>
 </html>
